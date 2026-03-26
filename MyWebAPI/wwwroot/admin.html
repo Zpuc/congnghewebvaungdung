@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Quản lý thuê sách(admin)</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-family: Arial, Helvetica, sans-serif;
+            scroll-behavior: smooth;
+            overflow: hidden;
+        }
+
+        #ThueSach {
+            overflow: hidden;
+        }
+    </style>
+    <link rel="stylesheet" href="style_admin.css">
+</head>
+<body>
+    <div id="ThueSach">
+        <div id="header" class="admin">
+            <div id="header-left">
+                <p>Admin</p>
+            </div>
+            <div id="header-right">
+                <label class="f13px">Admin</label>
+                <button id="Logout">Đăng xuất</button>
+
+            </div>
+        </div>
+        <div id="left">
+            <ul id="list-manage">
+                <button onclick="loadPage('Readermanagement.html')"><li>Quản lý bạn đọc </li></button>
+                <button onclick="loadPage('')"><li>Quản lý sách </li></button>
+                <button onclick="loadPage('')"><li>Quản lý cho thuê </li></button>
+                <button onclick="loadPage('')"><li>Quản lý đặt chỗ</li></button>
+            </ul>
+        </div>
+        <div id="right">
+            <div id="content">Chọn menu bên trái để xem nội dung</div>
+        </div>
+    </div>
+    <script>
+        document.querySelectorAll('#list-manage li a').forEach(link => {
+            link.addEventListener('click', function () {
+                document.querySelectorAll('#list-manage li').forEach(li => li.classList.remove('active'));
+                this.parentElement.classList.add('active');
+            });
+        });
+        function loadPage(page) {
+            fetch(page)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('content').innerHTML = html;
+                })
+                .catch(err => {
+                    document.getElementById('content').innerHTML = "<p style='color:red'>Không tải được trang.</p>";
+                });
+        }
+    </script>
+</body>
+</html>

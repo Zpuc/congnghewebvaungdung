@@ -1,0 +1,489 @@
+{
+  "info": {
+    "name": "MyWebAPI Collection",
+    "_postman_id": "d8b9a5cb-36ad-4a97-9b03-2cfa6cf3f224",
+    "description": "Collection test cac API hien co trong du an.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://localhost:7159" },
+    { "key": "token", "value": "" },
+    { "key": "maTheLoai", "value": "" },
+    { "key": "maSach", "value": "" },
+    { "key": "maKe", "value": "" },
+    { "key": "maBanSao", "value": "" },
+    { "key": "maBanDoc", "value": "" },
+    { "key": "maPhieuMuon", "value": "" },
+    { "key": "maDatCho", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "DangNhap",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenDangNhap\": \"admin\",\n  \"matKhau\": \"admin123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/DangNhap/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.token) {",
+                  "  pm.collectionVariables.set('token', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Reader",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hoTen\": \"Ban Doc Test\",\n  \"email\": \"bandoc@test.local\",\n  \"dienThoai\": \"0912345678\",\n  \"matKhau\": \"123456\"\n}"
+            },
+            "url": "{{baseUrl}}/api/DangNhap/register-reader"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TaiKhoan",
+      "item": [
+        { "name": "Get All", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/TaiKhoan" } },
+        { "name": "Get By Id", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/TaiKhoan/TKADMIN" } },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"maTaiKhoan\": \"TKNEW01\",\n  \"tenDangNhap\": \"newuser\",\n  \"matKhau\": \"123456\",\n  \"vaiTro\": \"Thủ thư\",\n  \"maBanDoc\": null\n}" },
+            "url": "{{baseUrl}}/api/TaiKhoan"
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"tenDangNhap\": \"newuser\",\n  \"matKhau\": \"123456\",\n  \"vaiTro\": \"Thủ thư\",\n  \"maBanDoc\": null\n}" },
+            "url": "{{baseUrl}}/api/TaiKhoan/TKNEW01"
+          }
+        },
+        { "name": "Delete", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/TaiKhoan/TKNEW01" } },
+        {
+          "name": "Register Reader (TaiKhoanController)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"hoTen\": \"Ban Doc Moi\",\n  \"email\": \"moi@test.local\",\n  \"dienThoai\": \"0999999999\",\n  \"matKhau\": \"123456\"\n}" },
+            "url": "{{baseUrl}}/api/TaiKhoan/register-reader"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sach",
+      "item": [
+        { "name": "Get All", "request": { "method": "GET", "url": "{{baseUrl}}/api/Sach" } },
+        { "name": "Get By Id", "request": { "method": "GET", "url": "{{baseUrl}}/api/Sach/{{maSach}}" } },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"tieuDe\": \"Sach Test\",\n  \"tacGia\": \"Tac Gia\",\n  \"namXuatBan\": 2024,\n  \"maTheLoai\": \"{{maTheLoai}}\"\n}" },
+            "url": "{{baseUrl}}/api/Sach"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json?.data?.maSach || json?.data?.MaSach;",
+                  "  if (id) pm.collectionVariables.set('maSach', id);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"tieuDe\": \"Sach Test Updated\",\n  \"tacGia\": \"Tac Gia\",\n  \"namXuatBan\": 2025,\n  \"maTheLoai\": \"{{maTheLoai}}\"\n}" },
+            "url": "{{baseUrl}}/api/Sach/{{maSach}}"
+          }
+        },
+        { "name": "Delete", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/Sach/{{maSach}}" } }
+      ]
+    },
+    {
+      "name": "BanSao",
+      "item": [
+        { "name": "Get All", "request": { "method": "GET", "url": "{{baseUrl}}/api/BanSao" } },
+        { "name": "Get By Id", "request": { "method": "GET", "url": "{{baseUrl}}/api/BanSao/{{maBanSao}}" } },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+                "body": { "mode": "raw", "raw": "{\n  \"maVach\": \"VACH001\",\n  \"maSach\": \"{{maSach}}\",\n  \"maKe\": \"{{maKe}}\",\n  \"soLuong\": 1,\n  \"trangThai\": \"Có sẵn\"\n}" },
+            "url": "{{baseUrl}}/api/BanSao"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json?.data?.maBanSao || json?.data?.MaBanSao;",
+                  "  if (id) pm.collectionVariables.set('maBanSao', id);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+                "body": { "mode": "raw", "raw": "{\n  \"maVach\": \"VACH001-UPDATED\",\n  \"maSach\": \"{{maSach}}\",\n  \"maKe\": \"{{maKe}}\",\n  \"soLuong\": 1,\n  \"trangThai\": \"Đang mượn\"\n}" },
+            "url": "{{baseUrl}}/api/BanSao/{{maBanSao}}"
+          }
+        },
+        { "name": "Delete", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/BanSao/{{maBanSao}}" } }
+      ]
+    },
+    {
+      "name": "TheLoai",
+      "item": [
+        { "name": "Get All", "request": { "method": "GET", "url": "{{baseUrl}}/api/TheLoai" } },
+        { "name": "Get By Id", "request": { "method": "GET", "url": "{{baseUrl}}/api/TheLoai/{{maTheLoai}}" } },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"tenTheLoai\": \"CNTT\"\n}" },
+            "url": "{{baseUrl}}/api/TheLoai"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json?.data?.maTheLoai || json?.data?.MaTheLoai;",
+                  "  if (id) pm.collectionVariables.set('maTheLoai', id);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"tenTheLoai\": \"Cong nghe thong tin\"\n}" },
+            "url": "{{baseUrl}}/api/TheLoai/{{maTheLoai}}"
+          }
+        },
+        { "name": "Delete", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/TheLoai/{{maTheLoai}}" } }
+      ]
+    },
+    {
+      "name": "BanDoc",
+      "item": [
+        { "name": "Get All", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/BanDoc" } },
+        { "name": "Get By Id", "request": { "method": "GET", "url": "{{baseUrl}}/api/BanDoc/{{maBanDoc}}" } },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"soThe\": \"ST00000001\",\n  \"hoTen\": \"Ban Doc 1\",\n  \"email\": \"bd1@test.local\",\n  \"dienThoai\": \"0900000001\",\n  \"hanThe\": \"2027-01-01\",\n  \"trangThaiThe\": \"Hoạt động\",\n  \"duNo\": 0\n}" },
+            "url": "{{baseUrl}}/api/BanDoc"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json?.data?.maBanDoc || json?.data?.MaBanDoc;",
+                  "  if (id) pm.collectionVariables.set('maBanDoc', id);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"hoTen\": \"Ban Doc Updated\",\n  \"email\": \"bd1@test.local\",\n  \"dienThoai\": \"0900000001\",\n  \"hanThe\": \"2027-01-01\",\n  \"trangThaiThe\": \"Hoạt động\",\n  \"duNo\": 0\n}" },
+            "url": "{{baseUrl}}/api/BanDoc/{{maBanDoc}}"
+          }
+        },
+        { "name": "Delete", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/BanDoc/{{maBanDoc}}" } },
+        {
+          "name": "Update Info",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"hoTen\": \"Ban Doc Tu Cap Nhat\",\n  \"email\": \"bd1new@test.local\",\n  \"dienThoai\": \"0900000002\"\n}" },
+            "url": "{{baseUrl}}/api/BanDoc/update-info/{{maBanDoc}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "KeSach",
+      "item": [
+        { "name": "Get All", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/KeSach" } },
+        { "name": "Get By Id", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/KeSach/{{maKe}}" } },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"viTri\": \"Tang 1\"\n}" },
+            "url": "{{baseUrl}}/api/KeSach"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json?.data?.maKe || json?.data?.MaKe;",
+                  "  if (id) pm.collectionVariables.set('maKe', id);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"viTri\": \"Tang 1\"\n}" },
+            "url": "{{baseUrl}}/api/KeSach/{{maKe}}"
+          }
+        },
+        { "name": "Delete", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/KeSach/{{maKe}}" } }
+      ]
+    },
+    {
+      "name": "PhieuMuon",
+      "item": [
+        { "name": "Get All", "request": { "method": "GET", "url": "{{baseUrl}}/api/PhieuMuon" } },
+        { "name": "Get By Id", "request": { "method": "GET", "url": "{{baseUrl}}/api/PhieuMuon/{{maPhieuMuon}}" } },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"maPhieuMuon\": \"PM_TEMP\",\n  \"maBanSao\": \"{{maBanSao}}\",\n  \"maBanDoc\": \"{{maBanDoc}}\",\n  \"ngayMuon\": \"2026-03-26\",\n  \"hanTra\": \"2026-12-31\",\n  \"ngayTraThucTe\": null,\n  \"soLanGiaHan\": 0,\n  \"trangThai\": \"Đang mở\"\n}" },
+            "url": "{{baseUrl}}/api/PhieuMuon"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json?.data?.maPhieuMuon || json?.data?.MaPhieuMuon;",
+                  "  if (id) pm.collectionVariables.set('maPhieuMuon', id);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"maBanSao\": \"{{maBanSao}}\",\n  \"maBanDoc\": \"{{maBanDoc}}\",\n  \"ngayMuon\": \"2026-03-26\",\n  \"hanTra\": \"2026-12-30\",\n  \"ngayTraThucTe\": null,\n  \"soLanGiaHan\": 0,\n  \"trangThai\": \"Đang mở\"\n}" },
+            "url": "{{baseUrl}}/api/PhieuMuon/{{maPhieuMuon}}"
+          }
+        },
+        { "name": "Delete", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/PhieuMuon/{{maPhieuMuon}}" } },
+        {
+          "name": "Tra Sach Va Tinh Phat",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"maPhieuMuon\": \"{{maPhieuMuon}}\",\n  \"ngayTraThucTe\": \"2026-12-31\"\n}" },
+            "url": "{{baseUrl}}/api/PhieuMuon/tra-sach-va-tinh-phat"
+          }
+        }
+      ]
+    },
+    {
+      "name": "DatCho",
+      "item": [
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"maSach\": \"{{maSach}}\",\n  \"maBanDoc\": \"{{maBanDoc}}\"\n}" },
+            "url": "{{baseUrl}}/api/DatCho"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const raw = pm.response.text();",
+                  "  try {",
+                  "    const json = pm.response.json();",
+                  "    const id = json?.data || json?.Data || json;",
+                  "    if (typeof id === 'string' && id) pm.collectionVariables.set('maDatCho', id.replace(/\\\"/g,''));",
+                  "  } catch (e) {",
+                  "    if (raw) pm.collectionVariables.set('maDatCho', raw.replace(/\\\"/g,''));",
+                  "  }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        { "name": "Get By Id", "request": { "method": "GET", "url": "{{baseUrl}}/api/DatCho/{{maDatCho}}" } },
+        { "name": "Get List", "request": { "method": "GET", "url": "{{baseUrl}}/api/DatCho" } },
+        {
+          "name": "Ready",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"maSach\": \"{{maSach}}\",\n  \"giuTrongGio\": 48\n}" },
+            "url": "{{baseUrl}}/api/DatCho/ready"
+          }
+        },
+        { "name": "Cancel", "request": { "method": "POST", "url": "{{baseUrl}}/api/DatCho/{{maDatCho}}/cancel" } },
+        { "name": "Expire", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/DatCho/expire" } }
+      ]
+    },
+    {
+      "name": "Phat",
+      "item": [
+        { "name": "Get All", "request": { "method": "GET", "url": "{{baseUrl}}/api/Phat" } },
+        { "name": "Get By Id", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/Phat/PH001" } },
+        {
+          "name": "TraSachVaTinhPhat",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"maPhieuMuon\": \"{{maPhieuMuon}}\",\n  \"ngayTraThucTe\": \"2026-12-31\"\n}" },
+            "url": "{{baseUrl}}/api/Phat/TraSachVaTinhPhat"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ThanhToan",
+      "item": [
+        { "name": "Get All", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/ThanhToan" } },
+        { "name": "Get By Id", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/ThanhToan/TT001" } },
+        {
+          "name": "Create From Phat",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"maPhat\": \"PH001\",\n  \"hinhThuc\": \"Tiền mặt\",\n  \"ghiChu\": \"Test thanh toan\"\n}" },
+            "url": "{{baseUrl}}/api/ThanhToan/phat"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TonKho",
+      "item": [
+        { "name": "Thong Ke The Loai", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/TonKho/the-loai" } },
+        { "name": "Thong Ke Sach", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/TonKho/sach" } }
+      ]
+    }
+  ]
+}
+

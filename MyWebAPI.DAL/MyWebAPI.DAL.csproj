@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>    
+	  <OutputType>Library</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyWebAPI.DTO\MyWebAPI.DTO.csproj" />
+  </ItemGroup>
+
+  <!--
+    Tránh compiler nhặt nhầm source bị lồng (có controllers/program.cs) nằm trong thư mục ptpmhuongdichvu.
+    Thư mục này làm build hỏng khi chạy dotnet build/dotnet run.
+  -->
+  <ItemGroup>
+    <Compile Remove="ptpmhuongdichvu\**\*.cs" />
+  </ItemGroup>
+
+</Project>
