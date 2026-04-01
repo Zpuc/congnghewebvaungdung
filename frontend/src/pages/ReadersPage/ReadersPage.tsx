@@ -221,7 +221,11 @@ export function ReadersPage() {
         loading={loading}
         columns={columns}
         dataSource={rows}
-        pagination={{ pageSize: 8 }}
+        pagination={{
+          pageSize: 8,
+          showSizeChanger: true,
+          showTotal: (total) => `Tổng ${total} bạn đọc`,
+        }}
         scroll={{ x: 1200 }}
       />
 

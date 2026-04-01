@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using System.Threading.Tasks;
 using Microsoft.OpenApi.Models;
 using MyWebAPI.BLL;
 using MyWebAPI.BLL.Services;
@@ -27,7 +29,9 @@ builder.Services.AddCors(options =>
                 "http://localhost:5500",
                 "https://localhost:7053",
                 "http://localhost:5173",
-                "http://localhost:5174")
+                "http://localhost:5174",
+                "http://127.0.0.1:5173",
+                "http://127.0.0.1:5174")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -86,6 +90,8 @@ builder.Services
     })
     .AddJwtBearer(options =>
     {
+        // Map claim "role" trong JWT → ClaimTypes.Role để [Authorize(Roles = "...")] khớp ổn định.
+        options.MapInboundClaims = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -95,7 +101,30 @@ builder.Services
             ValidIssuer = jwtSection["Issuer"],
             ValidAudience = jwtSection["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
+            RoleClaimType = System.Security.Claims.ClaimTypes.Role,
+        };
+
+        // GET kệ công khai: không đọc/validate Bearer — tránh 401 + WWW-Authenticate khi browser vẫn gửi token hết hạn.
+        // POST/PUT/DELETE /api/KeSach vẫn đọc JWT bình thường (có [Authorize]).
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var path = context.Request.Path.Value ?? string.Empty;
+                if (HttpMethods.IsGet(context.Request.Method) &&
+                    (string.Equals(path, "/api/KeSach", StringComparison.OrdinalIgnoreCase) ||
+                     path.StartsWith("/api/KeSach/", StringComparison.OrdinalIgnoreCase)))
+                {
+                    context.NoResult();
+                }
+                return Task.CompletedTask;
+            },
+            OnAuthenticationFailed = context =>
+            {
+                context.NoResult();
+                return Task.CompletedTask;
+            },
         };
     });
 
@@ -151,7 +180,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
-app.UseHttpsRedirection();
+
+// KHÔNG dùng UseHttpsRedirection: khi SPA gọi http://localhost:5057, middleware này trả 307→HTTPS
+// và trình duyệt từ chối CORS trên request OPTIONS ("Redirect is not allowed for a preflight request").
+// Triển khai thật: bật HTTPS ở reverse proxy / IIS trước API.
 
 app.UseCors(CorsPolicy);
 

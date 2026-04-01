@@ -9,6 +9,8 @@ import { RoleLayout } from './layouts/RoleLayout'
 import { AdminAccountsPage } from './pages/AdminAccountsPage/AdminAccountsPage'
 import { BooksPage } from './pages/BooksPage/BooksPage'
 import { ReadersPage } from './pages/ReadersPage/ReadersPage'
+import { BanSaoPage } from './pages/BanSaoPage/BanSaoPage'
+import { KeSachPage } from './pages/KeSachPage/KeSachPage'
 import { CategoriesPage } from './pages/CategoriesPage/CategoriesPage'
 import './App.css'
 
@@ -36,7 +38,9 @@ export default function App() {
             <Route index element={<AdminPage />} />
           <Route path="the-loai" element={<CategoriesPage />} />
             <Route path="sach" element={<BooksPage />} />
+            <Route path="ke-sach" element={<KeSachPage />} />
           <Route path="ban-doc" element={<ReadersPage />} />
+            <Route path="ban-sao" element={<BanSaoPage />} />
             <Route path="tai-khoan" element={<AdminAccountsPage />} />
           </Route>
           <Route
@@ -50,7 +54,9 @@ export default function App() {
             <Route index element={<LibrarianPage />} />
           <Route path="the-loai" element={<CategoriesPage />} />
             <Route path="sach" element={<BooksPage />} />
+            <Route path="ke-sach" element={<KeSachPage />} />
           <Route path="ban-doc" element={<ReadersPage />} />
+            <Route path="ban-sao" element={<BanSaoPage />} />
           </Route>
           <Route
             path="/ban-doc"

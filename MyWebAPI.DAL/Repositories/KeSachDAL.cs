@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using MyWebAPI.DTO;
 using System;
 using System.Collections.Generic;
@@ -27,6 +27,9 @@ namespace MyWebAPI.DAL.Repositories
             _connStr = connectionString;
         }
 
+        private static string ReadNvarchar(SqlDataReader rd, int ord) =>
+            rd.IsDBNull(ord) ? string.Empty : rd.GetString(ord);
+
         public async Task<List<KeSachDTO>> GetAllAsync()
         {
             var list = new List<KeSachDTO>();
@@ -40,8 +43,8 @@ namespace MyWebAPI.DAL.Repositories
             {
                 list.Add(new KeSachDTO
                 {
-                    maKe = rd.GetString(0),
-                    viTri = rd.GetString(1)
+                    maKe = ReadNvarchar(rd, 0),
+                    viTri = ReadNvarchar(rd, 1)
                 });
             }
             return list;
@@ -60,8 +63,8 @@ namespace MyWebAPI.DAL.Repositories
             {
                 return new KeSachDTO
                 {
-                    maKe = rd.GetString(0),
-                    viTri = rd.GetString(1)
+                    maKe = ReadNvarchar(rd, 0),
+                    viTri = ReadNvarchar(rd, 1)
                 };
             }
             return null;

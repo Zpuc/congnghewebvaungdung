@@ -902,4 +902,3 @@ BEGIN
     INSERT INTO dbo.BanSao (MaBanSao, MaVach, MaSach, MaKe, TrangThai)
     VALUES ('BS001', 'VACH001', 'S001', 'KS001', N'Có sẵn');
 END
-GO

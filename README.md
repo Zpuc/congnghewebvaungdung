@@ -50,6 +50,14 @@ Tại thư mục gốc repo:
 dotnet run --project API/API.csproj
 ```
 
+Mặc định profile **http** thường chỉ mở **`http://localhost:5057`**. Nếu bạn cần HTTPS `https://localhost:7159`, chạy:
+
+```bash
+dotnet run --project API/API.csproj --launch-profile https
+```
+
+**Frontend** (`frontend/.env.development`) trỏ `VITE_API_BASE_URL` về đúng URL trên (mặc định đã dùng `http://localhost:5057` cho khớp `dotnet run`). Nếu đổi cổng hoặc HTTPS, sửa env và **chạy lại** `npm run dev`.
+
 Hoặc mở `MyWebAPI.sln` bằng Visual Studio và Run.
 
 ### 3.3 Nếu build bị “file is locked”
@@ -86,9 +94,15 @@ npm install
 
 ### 5.2 Chạy dev server
 
+**Bật API trước** (mục 3, `http://localhost:5057`), rồi:
+
 ```bash
 npm run dev
 ```
+
+Frontend mặc định dùng **Vite proxy**: trình duyệt gọi `http://localhost:5173/api/...`, Vite chuyển tiếp sang API (giảm lỗi CORS/preflight). Chỉ cần đổi `VITE_API_BASE_URL` trong `frontend/.env.development` nếu bạn **không** muốn dùng proxy.
+
+Nếu thấy **`net::ERR_CONNECTION_REFUSED`**: backend chưa chạy hoặc sai cổng so với `vite.config.ts` → `proxy['/api'].target`.
 
 Mặc định sẽ chạy tại:
 - `http://localhost:5173/`
@@ -99,6 +113,7 @@ Trang đăng nhập:
 ---
 
 ## 6) Ghi chú nhanh
+- **CORS + HTTP:** API **không** bật `UseHttpsRedirection` (redirect HTTP→HTTPS làm hỏng CORS preflight khi gọi `http://localhost:5057` từ Vite). HTTPS nên cấu hình ở proxy/IIS phía trước khi deploy.
 - `PhieuMuon.NgayTraThucTe`: theo nghiệp vụ **được phép NULL khi tạo phiếu mượn**, chỉ set khi trả sách.
 - `PhieuMuon.TrangThai`: theo hướng đang dùng: **`Đang mở` / `Đã đóng`**
 - `BanSao.TrangThai`: **`Có sẵn` / `Đang mượn` / `Hư hỏng`**

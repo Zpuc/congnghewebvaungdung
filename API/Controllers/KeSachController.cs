@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyWebAPI.BLL.Services;
 using MyWebAPI.DTO;
@@ -16,8 +16,8 @@ namespace MyWebAPI.Controllers
             _keSachService = keSachService;
         }
 
-        // GET api/kesach
-        [Authorize(Roles = "Quản trị, Thủ thư")]
+        // GET api/kesach — công khai như GET /api/Sach (dropdown, tra cứu); thay đổi/ghi vẫn bắt JWT.
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -26,7 +26,7 @@ namespace MyWebAPI.Controllers
         }
 
         // GET api/kesach/{id}
-        [Authorize(Roles = "Quản trị, Thủ thư")]
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {

@@ -14,7 +14,9 @@ function getMenuByRole(role: UserRole): MenuItem[] {
       { key: '/admin', label: 'Tổng quan', path: '/admin' },
       { key: '/admin/the-loai', label: 'Quản lý thể loại', path: '/admin/the-loai' },
       { key: '/admin/sach', label: 'Quản lý sách', path: '/admin/sach' },
-      { key: '/admin/ban-doc', label: 'Quản lý bạn đọc', path: '/admin/ban-doc' },
+      { key: '/admin/ke-sach', label: 'Quản lý kệ sách', path: '/admin/ke-sach' },
+      { key: '/admin/ban-sao', label: 'Quản lý bản sao', path: '/admin/ban-sao' },
+      { key: '/admin/ban-doc', label: 'Quản lý Bạn Đọc', path: '/admin/ban-doc' },
       { key: '/admin/tai-khoan', label: 'Quản lý tài khoản', path: '/admin/tai-khoan' },
     ]
   }
@@ -23,7 +25,9 @@ function getMenuByRole(role: UserRole): MenuItem[] {
       { key: '/thu-thu', label: 'Tổng quan', path: '/thu-thu' },
       { key: '/thu-thu/the-loai', label: 'Quản lý thể loại', path: '/thu-thu/the-loai' },
       { key: '/thu-thu/sach', label: 'Quản lý sách', path: '/thu-thu/sach' },
-      { key: '/thu-thu/ban-doc', label: 'Quản lý bạn đọc', path: '/thu-thu/ban-doc' },
+      { key: '/thu-thu/ke-sach', label: 'Quản lý kệ sách', path: '/thu-thu/ke-sach' },
+      { key: '/thu-thu/ban-sao', label: 'Quản lý bản sao', path: '/thu-thu/ban-sao' },
+      { key: '/thu-thu/ban-doc', label: 'Quản lý Bạn Đọc', path: '/thu-thu/ban-doc' },
     ]
   }
   return [{ key: '/ban-doc', label: 'Trang của tôi', path: '/ban-doc' }]
