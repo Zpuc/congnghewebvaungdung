@@ -16,6 +16,7 @@ namespace MyWebAPI.BLL.Services
         {
             Task<List<PhatDTO>> GetAllAsync();
             Task<PhatDTO?> GetByIdAsync(string maPhat);
+            Task<List<PhatDTO>> GetByMaBanDocAsync(string maBanDoc);
             Task<TraSachResultDTO> TraSachVaTinhPhatAsync(TraSachDTO dto);
         }
 
@@ -27,6 +28,8 @@ namespace MyWebAPI.BLL.Services
             public Task<List<PhatDTO>> GetAllAsync() => _repo.GetAllAsync();
 
             public Task<PhatDTO?> GetByIdAsync(string maPhat) => _repo.GetByIdAsync(maPhat);
+
+            public Task<List<PhatDTO>> GetByMaBanDocAsync(string maBanDoc) => _repo.GetByMaBanDocAsync(maBanDoc);
 
             public async Task<TraSachResultDTO> TraSachVaTinhPhatAsync(TraSachDTO dto)
             {

@@ -288,6 +288,85 @@ BEGIN
     WHERE MaPhieuMuon = @MaPhieuMuon;
 END
 
+GO
+/* Yêu cầu thanh toán phạt: bạn đọc gửi → admin duyệt → ghi ThanhToan, xóa Phat */
+IF OBJECT_ID(N'dbo.YeuCauThanhToanPhat', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.YeuCauThanhToanPhat (
+        MaYeuCau NVARCHAR(30) NOT NULL PRIMARY KEY,
+        MaPhat NVARCHAR(20) NOT NULL,
+        MaBanDoc NVARCHAR(20) NOT NULL,
+        SoTien DECIMAL(12,2) NOT NULL CHECK (SoTien >= 0),
+        HinhThuc NVARCHAR(20) NOT NULL,
+        GhiChu NVARCHAR(255) NULL,
+        TrangThai NVARCHAR(20) NOT NULL CHECK (TrangThai IN (N'Chờ duyệt', N'Đã duyệt', N'Từ chối')),
+        NgayTao DATETIME2 NOT NULL CONSTRAINT DF_YeuCauTT_NgayTao DEFAULT SYSUTCDATETIME(),
+        MaThanhToan NVARCHAR(20) NULL,
+        CONSTRAINT FK_YeuCauTT_BanDoc FOREIGN KEY (MaBanDoc) REFERENCES dbo.BanDoc(MaBanDoc)
+    );
+    CREATE INDEX IX_YeuCauTT_MaPhat ON dbo.YeuCauThanhToanPhat(MaPhat);
+    CREATE INDEX IX_YeuCauTT_TrangThai ON dbo.YeuCauThanhToanPhat(TrangThai);
+END
+GO
+
+CREATE OR ALTER PROCEDURE sp_TraSachVaTinhPhat
+    @MaPhieuMuon NVARCHAR(20),
+    @NgayTraThucTe DATETIME,
+    @SoNgayTre INT OUTPUT,
+    @TienPhat DECIMAL(12,2) OUTPUT,
+    @MaPhat NVARCHAR(20) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    SET @SoNgayTre = 0;
+    SET @TienPhat = 0;
+    SET @MaPhat = NULL;
+
+    DECLARE @HanTra DATE;
+    DECLARE @MaBanSao NVARCHAR(20);
+    DECLARE @TrangThai NVARCHAR(20);
+    DECLARE @PhiTreHanMoiNgay DECIMAL(12,2) = 5000.00;
+    DECLARE @NgayTra DATE = CAST(@NgayTraThucTe AS DATE);
+
+    BEGIN TRAN;
+    BEGIN TRY
+        SELECT @HanTra = HanTra, @MaBanSao = MaBanSao, @TrangThai = TrangThai
+        FROM dbo.PhieuMuon WITH (UPDLOCK, ROWLOCK)
+        WHERE MaPhieuMuon = @MaPhieuMuon;
+
+        IF @TrangThai IS NULL
+            THROW 50001, N'Không tìm thấy phiếu mượn.', 1;
+
+        IF @TrangThai <> N'Đang mở'
+            THROW 50002, N'Phiếu không ở trạng thái Đang mở.', 1;
+
+        UPDATE dbo.PhieuMuon
+        SET NgayTraThucTe = @NgayTra, TrangThai = N'Đã đóng'
+        WHERE MaPhieuMuon = @MaPhieuMuon;
+
+        UPDATE dbo.BanSao SET TrangThai = N'Có sẵn' WHERE MaBanSao = @MaBanSao;
+
+        SET @SoNgayTre = DATEDIFF(DAY, @HanTra, @NgayTra);
+        IF @SoNgayTre < 0 SET @SoNgayTre = 0;
+
+        IF @SoNgayTre > 0
+        BEGIN
+            SET @TienPhat = @SoNgayTre * @PhiTreHanMoiNgay;
+            SET @MaPhat = CONCAT('PP', FORMAT(SYSUTCDATETIME(), 'yyyyMMddHHmmssfff'));
+            INSERT INTO dbo.Phat(MaPhat, MaPhieuMuon, SoTien, LyDo, NgayTinh, TrangThai, MaThanhToan)
+            VALUES(@MaPhat, @MaPhieuMuon, @TienPhat, N'Trễ hạn', SYSUTCDATETIME(), N'Chưa trả', NULL);
+        END
+
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK;
+        THROW;
+    END CATCH
+END
+
 -- Đăng nhập
 GO
 CREATE OR ALTER PROCEDURE sp_Login
@@ -616,6 +695,26 @@ AS
 BEGIN
 	DELETE FROM KeSach
 	WHERE MaKe = @MaKe;
+END
+GO
+
+GO
+CREATE OR ALTER PROCEDURE sp_GetAllPhat
+AS
+BEGIN
+	SELECT MaPhat, MaPhieuMuon, SoTien, LyDo, NgayTinh, TrangThai, MaThanhToan
+	FROM Phat
+	ORDER BY NgayTinh DESC;
+END
+GO
+GO
+CREATE OR ALTER PROCEDURE sp_GetPhatById
+	@MaPhat NVARCHAR(20)
+AS
+BEGIN
+	SELECT MaPhat, MaPhieuMuon, SoTien, LyDo, NgayTinh, TrangThai, MaThanhToan
+	FROM Phat
+	WHERE MaPhat = @MaPhat;
 END
 GO
 

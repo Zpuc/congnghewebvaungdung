@@ -1,6 +1,6 @@
 using System;
-using Microsoft.Data.SqlClient;
 using System.Data;
+using Microsoft.Data.SqlClient;
 using MyWebAPI.DTO;
 
 namespace MyWebAPI.DAL.Repositories
@@ -144,72 +144,85 @@ namespace MyWebAPI.DAL.Repositories
             }
             public async Task<TraSachVaTinhPhatResultDTO> TraSachVaTinhPhatAsync(TraSachVaTinhPhatRequest request)
             {
-                using var con = new SqlConnection(_connStr);
+                // Không phụ thuộc sp_TraSachVaTinhPhat trên DB (nhiều môi trường chưa tạo procedure).
+                const decimal phiTreHanMoiNgay = 5000m;
+
+                await using var con = new SqlConnection(_connStr);
                 await con.OpenAsync();
+                await using var tx = await con.BeginTransactionAsync();
 
-                int soNgayTre = 0;
-                decimal tienPhat = 0m;
-                string? maPhat = null;
-                PhieuMuonDTO? phieuMuon = null;
+                DateTime hanTra;
+                string maBanSao;
+                string trangThai;
 
-                // 1) Gọi store sp_TraSachVaTinhPhat
-                using (var cmd = new SqlCommand("sp_TraSachVaTinhPhat", con))
+                const string sqlSelect = @"
+SELECT HanTra, MaBanSao, TrangThai
+FROM dbo.PhieuMuon WITH (UPDLOCK, ROWLOCK)
+WHERE MaPhieuMuon = @MaPhieuMuon;";
+                await using (var cmd = new SqlCommand(sqlSelect, con, (SqlTransaction)tx))
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
                     cmd.Parameters.AddWithValue("@MaPhieuMuon", request.MaPhieuMuon);
-                    cmd.Parameters.AddWithValue("@NgayTraThucTe", request.NgayTraThucTe.Date);
-
-                    var pSoNgayTre = cmd.Parameters.Add("@SoNgayTre", SqlDbType.Int);
-                    pSoNgayTre.Direction = ParameterDirection.Output;
-
-                    var pTienPhat = cmd.Parameters.Add("@TienPhat", SqlDbType.Decimal);
-                    pTienPhat.Direction = ParameterDirection.Output;
-                    pTienPhat.Precision = 12;
-                    pTienPhat.Scale = 2;
-
-                    var pMaPhat = cmd.Parameters.Add("@MaPhat", SqlDbType.NVarChar, 20);
-                    pMaPhat.Direction = ParameterDirection.Output;
-
-                    await cmd.ExecuteNonQueryAsync();
-
-                    if (pSoNgayTre.Value != DBNull.Value)
-                        soNgayTre = (int)pSoNgayTre.Value;
-
-                    if (pTienPhat.Value != DBNull.Value)
-                        tienPhat = (decimal)pTienPhat.Value;
-
-                    if (pMaPhat.Value != DBNull.Value)
-                        maPhat = (string)pMaPhat.Value;
+                    await using var rd = await cmd.ExecuteReaderAsync();
+                    if (!await rd.ReadAsync())
+                        throw new InvalidOperationException("Không tìm thấy phiếu mượn.");
+                    hanTra = rd.GetDateTime(0);
+                    maBanSao = rd.GetString(1);
+                    trangThai = rd.GetString(2);
                 }
 
-                // 2) Lấy lại thông tin phiếu mượn bằng sp_GetPhieuMuonById
-                using (var cmdPm = new SqlCommand("sp_GetPhieuMuonById", con))
-                {
-                    cmdPm.CommandType = CommandType.StoredProcedure;
-                    cmdPm.Parameters.AddWithValue("@MaPhieuMuon", request.MaPhieuMuon);
+                if (trangThai != "Đang mở")
+                    throw new InvalidOperationException("Phiếu không ở trạng thái Đang mở.");
 
-                    using var rd = await cmdPm.ExecuteReaderAsync();
-                    if (await rd.ReadAsync())
+                var ngayTra = request.NgayTraThucTe.Date;
+
+                const string sqlUpdPm = @"
+UPDATE dbo.PhieuMuon
+SET NgayTraThucTe = @NgayTra, TrangThai = N'Đã đóng'
+WHERE MaPhieuMuon = @MaPhieuMuon;";
+                await using (var cmd = new SqlCommand(sqlUpdPm, con, (SqlTransaction)tx))
+                {
+                    cmd.Parameters.AddWithValue("@MaPhieuMuon", request.MaPhieuMuon);
+                    cmd.Parameters.AddWithValue("@NgayTra", ngayTra);
+                    await cmd.ExecuteNonQueryAsync();
+                }
+
+                const string sqlUpdBs = @"
+UPDATE dbo.BanSao SET TrangThai = N'Có sẵn' WHERE MaBanSao = @MaBanSao;";
+                await using (var cmd = new SqlCommand(sqlUpdBs, con, (SqlTransaction)tx))
+                {
+                    cmd.Parameters.AddWithValue("@MaBanSao", maBanSao);
+                    await cmd.ExecuteNonQueryAsync();
+                }
+
+                var han = hanTra.Date;
+                var tra = ngayTra.Date;
+                var soNgayTre = Math.Max(0, (tra - han).Days);
+
+                decimal tienPhat = 0m;
+                string? maPhat = null;
+
+                if (soNgayTre > 0)
+                {
+                    tienPhat = soNgayTre * phiTreHanMoiNgay;
+                    maPhat = "PP" + DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
+                    if (maPhat.Length > 20)
+                        maPhat = maPhat[..20];
+
+                    const string sqlInsPhat = @"
+INSERT INTO dbo.Phat(MaPhat, MaPhieuMuon, SoTien, LyDo, NgayTinh, TrangThai, MaThanhToan)
+VALUES(@MaPhat, @MaPhieuMuon, @SoTien, N'Trễ hạn', SYSUTCDATETIME(), N'Chưa trả', NULL);";
+                    await using (var cmdIns = new SqlCommand(sqlInsPhat, con, (SqlTransaction)tx))
                     {
-                        phieuMuon = new PhieuMuonDTO
-                        {
-                            MaPhieuMuon = rd["MaPhieuMuon"].ToString()!,
-                            MaBanDoc = rd["MaBanDoc"].ToString()!,
-                            MaBanSao = rd["MaBanSao"].ToString()!,
-                            NgayMuon = (DateTime)rd["NgayMuon"],
-                            HanTra = (DateTime)rd["HanTra"],
-                            NgayTraThucTe = rd["NgayTraThucTe"] == DBNull.Value
-                                              ? (DateTime?)null
-                                              : (DateTime)rd["NgayTraThucTe"],
-                            TrangThai = rd["TrangThai"].ToString()!,
-                            SoLanGiaHan = rd["SoLanGiaHan"] == DBNull.Value
-                                              ? 0
-                                              : (int)rd["SoLanGiaHan"]
-                        };
+                        cmdIns.Parameters.AddWithValue("@MaPhat", maPhat);
+                        cmdIns.Parameters.AddWithValue("@MaPhieuMuon", request.MaPhieuMuon);
+                        cmdIns.Parameters.AddWithValue("@SoTien", tienPhat);
+                        await cmdIns.ExecuteNonQueryAsync();
                     }
                 }
 
+                await tx.CommitAsync();
+
+                var phieuMuon = await GetByIdAsync(request.MaPhieuMuon);
                 return new TraSachVaTinhPhatResultDTO
                 {
                     PhieuMuon = phieuMuon,

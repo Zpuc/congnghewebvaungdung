@@ -147,6 +147,14 @@ namespace MyWebAPI.BLL.Services
                     };
                 }
 
+                existing.MaBanSao = request.MaBanSao;
+                existing.MaBanDoc = request.MaBanDoc;
+                existing.NgayMuon = request.NgayMuon;
+                existing.HanTra = request.HanTra;
+                existing.NgayTraThucTe = request.NgayTraThucTe;
+                existing.SoLanGiaHan = request.SoLanGiaHan;
+                existing.TrangThai = request.TrangThai;
+
                 var updated = await _phieuMuonRepository.UpdateAsync(maPhieuMuon, existing);
                 if (updated)
                 {

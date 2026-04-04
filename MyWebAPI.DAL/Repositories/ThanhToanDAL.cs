@@ -29,9 +29,12 @@ namespace MyWebAPI.DAL.Repositories
             var list = new List<ThanhToanDTO>();
             using var con = new SqlConnection(_connStr);
             await con.OpenAsync();
-            using var cmd = new SqlCommand("sp_GetAllThanhToan", con)
+            using var cmd = new SqlCommand(
+                @"SELECT MaThanhToan, MaBanDoc, NgayThanhToan, SoTien, HinhThuc, GhiChu
+                  FROM dbo.ThanhToan ORDER BY NgayThanhToan DESC;",
+                con)
             {
-                CommandType = CommandType.StoredProcedure
+                CommandType = CommandType.Text
             };
             using var rd = await cmd.ExecuteReaderAsync();
             while (await rd.ReadAsync())
@@ -54,9 +57,12 @@ namespace MyWebAPI.DAL.Repositories
             ThanhToanDTO? thanhtoan = null;
             using var con = new SqlConnection(_connStr);
             await con.OpenAsync();
-            using var cmd = new SqlCommand("sp_GetThanhToanById", con)
+            using var cmd = new SqlCommand(
+                @"SELECT MaThanhToan, MaBanDoc, NgayThanhToan, SoTien, HinhThuc, GhiChu
+                  FROM dbo.ThanhToan WHERE MaThanhToan = @MaThanhToan;",
+                con)
             {
-                CommandType = CommandType.StoredProcedure
+                CommandType = CommandType.Text
             };
             cmd.Parameters.AddWithValue("@MaThanhToan", maThanhToan);
             using var rd = await cmd.ExecuteReaderAsync();

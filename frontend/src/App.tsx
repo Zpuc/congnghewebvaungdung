@@ -12,6 +12,9 @@ import { ReadersPage } from './pages/ReadersPage/ReadersPage'
 import { BanSaoPage } from './pages/BanSaoPage/BanSaoPage'
 import { KeSachPage } from './pages/KeSachPage/KeSachPage'
 import { CategoriesPage } from './pages/CategoriesPage/CategoriesPage'
+import { PhatPage } from './pages/PhatPage/PhatPage'
+import { PhieuMuonPage } from './pages/PhieuMuonPage/PhieuMuonPage'
+import { ThanhToanPage } from './pages/ThanhToanPage/ThanhToanPage'
 import './App.css'
 
 export default function App() {
@@ -41,6 +44,9 @@ export default function App() {
             <Route path="ke-sach" element={<KeSachPage />} />
           <Route path="ban-doc" element={<ReadersPage />} />
             <Route path="ban-sao" element={<BanSaoPage />} />
+            <Route path="phieu-muon" element={<PhieuMuonPage />} />
+            <Route path="phat" element={<PhatPage />} />
+            <Route path="thanh-toan" element={<ThanhToanPage />} />
             <Route path="tai-khoan" element={<AdminAccountsPage />} />
           </Route>
           <Route
@@ -57,6 +63,9 @@ export default function App() {
             <Route path="ke-sach" element={<KeSachPage />} />
           <Route path="ban-doc" element={<ReadersPage />} />
             <Route path="ban-sao" element={<BanSaoPage />} />
+            <Route path="phieu-muon" element={<PhieuMuonPage />} />
+            <Route path="phat" element={<PhatPage />} />
+            <Route path="thanh-toan" element={<ThanhToanPage />} />
           </Route>
           <Route
             path="/ban-doc"

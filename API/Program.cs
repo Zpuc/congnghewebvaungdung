@@ -48,6 +48,7 @@ builder.Services.AddScoped<IBanDocRepository>(_ => new BanDocRepository(connecti
 builder.Services.AddScoped<IDatChoStorage>(_ => new SqlDatChoStorage(connectionString));
 builder.Services.AddScoped<IPhatRepository>(_ => new PhatRepository(connectionString));
 builder.Services.AddScoped<IThanhToanRepository>(_ => new ThanhToanRepository(connectionString));
+builder.Services.AddScoped<IYeuCauThanhToanPhatRepository>(_ => new YeuCauThanhToanPhatRepository(connectionString));
 builder.Services.AddScoped<ITonKhoRepository>(_ => new TonKhoRepository(connectionString));
 
 
@@ -62,6 +63,7 @@ builder.Services.AddScoped<IBanDocService, BanDocService>();
 builder.Services.AddScoped<IDatChoService, DatChoService>();
 builder.Services.AddScoped<IPhatService, PhatService>();
 builder.Services.AddScoped<IThanhToanService, ThanhToanService>();
+builder.Services.AddScoped<IYeuCauThanhToanPhatService, YeuCauThanhToanPhatService>();
 
 // ==================== JWT AUTHENTICATION ====================
 // BẮT BUỘC phải có section Jwt trong appsettings.json:
