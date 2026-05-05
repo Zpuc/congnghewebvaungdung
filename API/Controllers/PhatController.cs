@@ -49,5 +49,21 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>Tính phạt lũy tiến: mỗi 3 ngày chưa trả phạt, thêm 5000đ</summary>
+        [Authorize(Roles = "Quản trị, Thủ thư")]
+        [HttpPost("tinh-lai")]
+        public async Task<IActionResult> TinhPhatLai()
+        {
+            try
+            {
+                var rowsAffected = await _service.TinhPhatLaiAsync();
+                return Ok(new { success = true, message = $"Đã cập nhật {rowsAffected} bản ghi phạt", rowsAffected });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

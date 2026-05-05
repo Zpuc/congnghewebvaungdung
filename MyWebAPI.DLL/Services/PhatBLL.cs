@@ -18,6 +18,7 @@ namespace MyWebAPI.BLL.Services
             Task<PhatDTO?> GetByIdAsync(string maPhat);
             Task<List<PhatDTO>> GetByMaBanDocAsync(string maBanDoc);
             Task<TraSachResultDTO> TraSachVaTinhPhatAsync(TraSachDTO dto);
+            Task<int> TinhPhatLaiAsync();
         }
 
         public class PhatService : IPhatService
@@ -42,6 +43,8 @@ namespace MyWebAPI.BLL.Services
                     MaPhat = maPhat
                 };
             }
+
+            public Task<int> TinhPhatLaiAsync() => _repo.TinhPhatLaiAsync();
         }
     }
 }

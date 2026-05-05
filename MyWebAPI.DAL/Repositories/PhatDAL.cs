@@ -15,6 +15,7 @@ namespace MyWebAPI.DAL.Repositories
             Task<PhatDTO?> GetByIdAsync(string maPhat);
             Task<List<PhatDTO>> GetByMaBanDocAsync(string maBanDoc);
             Task<(int soNgayTre, decimal tienPhat, string? maPhat)> TraSachVaTinhPhatAsync(TraSachDTO dto);
+            Task<int> TinhPhatLaiAsync();
         }
 
         public class PhatRepository : IPhatRepository
@@ -112,6 +113,14 @@ ORDER BY p.NgayTinh DESC;";
                 string? maPhat = pMaPhat.Value is DBNull ? null : (string)pMaPhat.Value;
 
                 return (soNgayTre, tienPhat, maPhat);
+            }
+
+            public async Task<int> TinhPhatLaiAsync()
+            {
+                using var con = new SqlConnection(_connStr);
+                using var cmd = new SqlCommand("sp_TinhPhatLai", con) { CommandType = CommandType.StoredProcedure };
+                await con.OpenAsync();
+                return await cmd.ExecuteNonQueryAsync();
             }
         }
     }

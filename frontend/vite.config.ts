@@ -9,7 +9,7 @@ export default defineConfig({
       // Gọi /api từ browser tới cùng origin (5173) → Vite chuyển tiếp sang Xử lý API.
       // Tránh CORS/preflight và một số lỗi lạ khi gắn Authorization cross-origin.
       '/api': {
-        target: 'http://localhost:5057',
+        target: 'http://127.0.0.1:5000',
         changeOrigin: true,
       },
     },

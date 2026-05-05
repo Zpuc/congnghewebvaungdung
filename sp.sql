@@ -1001,3 +1001,44 @@ BEGIN
     INSERT INTO dbo.BanSao (MaBanSao, MaVach, MaSach, MaKe, TrangThai)
     VALUES ('BS001', 'VACH001', 'S001', 'KS001', N'Có sẵn');
 END
+
+-- Stored procedure tính phạt lũy tiến: mỗi 3 ngày chưa trả phạt, thêm 5000đ
+CREATE OR ALTER PROCEDURE sp_TinhPhatLai
+GO
+
+-- Stored procedure tính phạt lũy tiến: mỗi 3 ngày chưa trả phạt, thêm 5000đ
+CREATE OR ALTER PROCEDURE sp_TinhPhatLai
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    DECLARE @PhiTreHanMoiLan DECIMAL(12,2) = 5000.00;
+
+    -- Cập nhật tất cả phạt chưa trả đã qua ít nhất 3 ngày kể từ lần tính cuối
+    UPDATE dbo.Phat
+    SET SoTien = SoTien + @PhiTreHanMoiLan,
+        NgayTinh = SYSUTCDATETIME()
+    WHERE TrangThai = N'Chưa trả'
+      AND DATEDIFF(DAY, NgayTinh, SYSUTCDATETIME()) >= 3;
+END
+GO
+GO
+
+-- Stored procedure tính phạt lũy tiến: mỗi 3 ngày chưa trả phạt, thêm 5000đ
+CREATE OR ALTER PROCEDURE sp_TinhPhatLai
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    DECLARE @PhiTreHanMoiLan DECIMAL(12,2) = 5000.00;
+
+    -- Cập nhật tất cả phạt chưa trả đã qua ít nhất 3 ngày kể từ lần tính cuối
+    UPDATE dbo.Phat
+    SET SoTien = SoTien + @PhiTreHanMoiLan,
+        NgayTinh = SYSUTCDATETIME()
+    WHERE TrangThai = N'Chưa trả'
+      AND DATEDIFF(DAY, NgayTinh, SYSUTCDATETIME()) >= 3;
+END
+GO

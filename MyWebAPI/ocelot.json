@@ -4,11 +4,11 @@
       "UpstreamPathTemplate": "/api/bandoc",
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamPathTemplate": "/api/BanDoc",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
@@ -17,11 +17,11 @@
       "UpstreamPathTemplate": "/api/bandoc/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/BanDoc/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 1,
@@ -32,11 +32,11 @@
       "UpstreamPathTemplate": "/api/sach",
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamPathTemplate": "/api/Sach",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
@@ -45,11 +45,11 @@
       "UpstreamPathTemplate": "/api/sach/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/Sach/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 1,
@@ -60,11 +60,11 @@
       "UpstreamPathTemplate": "/api/taikhoan",
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamPathTemplate": "/api/TaiKhoan",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
@@ -73,11 +73,11 @@
       "UpstreamPathTemplate": "/api/taikhoan/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/TaiKhoan/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 1,
@@ -88,11 +88,11 @@
       "UpstreamPathTemplate": "/api/bansao",
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamPathTemplate": "/api/BanSao",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 1,
@@ -102,11 +102,11 @@
       "UpstreamPathTemplate": "/api/bansao/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/BanSao/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 2,
@@ -117,11 +117,11 @@
       "UpstreamPathTemplate": "/api/dangnhap/login",
       "UpstreamHttpMethod": [ "POST" ],
       "DownstreamPathTemplate": "/api/DangNhap/login",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 1,
@@ -131,11 +131,11 @@
       "UpstreamPathTemplate": "/api/dangnhap/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/DangNhap/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 2,
@@ -147,11 +147,11 @@
       "UpstreamPathTemplate": "/api/datcho",
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamPathTemplate": "/api/DatCho",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
@@ -160,11 +160,11 @@
       "UpstreamPathTemplate": "/api/datcho/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/DatCho/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 1,
@@ -176,11 +176,11 @@
       "UpstreamPathTemplate": "/api/kesach",
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamPathTemplate": "/api/KeSach",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
@@ -189,11 +189,11 @@
       "UpstreamPathTemplate": "/api/kesach/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/KeSach/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 1,
@@ -205,11 +205,11 @@
       "UpstreamPathTemplate": "/api/phat",
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamPathTemplate": "/api/Phat",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
@@ -218,11 +218,11 @@
       "UpstreamPathTemplate": "/api/phat/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/Phat/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 1,
@@ -234,11 +234,11 @@
       "UpstreamPathTemplate": "/api/phieumuon",
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamPathTemplate": "/api/PhieuMuon",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
@@ -247,11 +247,11 @@
       "UpstreamPathTemplate": "/api/phieumuon/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/PhieuMuon/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 1,
@@ -263,11 +263,11 @@
       "UpstreamPathTemplate": "/api/thanhtoan",
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamPathTemplate": "/api/ThanhToan",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
@@ -276,11 +276,11 @@
       "UpstreamPathTemplate": "/api/thanhtoan/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/ThanhToan/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 1,
@@ -292,11 +292,11 @@
       "UpstreamPathTemplate": "/api/theloai",
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamPathTemplate": "/api/TheLoai",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
@@ -305,11 +305,11 @@
       "UpstreamPathTemplate": "/api/theloai/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/TheLoai/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "Priority": 1,
@@ -319,11 +319,11 @@
       "UpstreamPathTemplate": "/api/tonkho/the-loai",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamPathTemplate": "/api/TonKho/the-loai",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
@@ -332,16 +332,16 @@
       "UpstreamPathTemplate": "/api/tonkho/sach",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamPathTemplate": "/api/TonKho/sach",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7159
+          "Port": 5001
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
     }
 
   ],
-  "GlobalConfiguration": { "BaseUrl": "https://localhost:7151/" }
+  "GlobalConfiguration": { "BaseUrl": "http://127.0.0.1:5000/" }
 }

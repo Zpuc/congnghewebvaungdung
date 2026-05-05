@@ -13,6 +13,7 @@ using static MyWebAPI.DAL.Repositories.PhatDAL;
 using static MyWebAPI.DAL.Repositories.PhieuMuonDAL;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://127.0.0.1:5001");
 
 // ==================== CONNECTION STRING ====================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")

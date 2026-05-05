@@ -3,6 +3,7 @@ using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://127.0.0.1:5000");
 
 // Đọc ocelot.json
 builder.Configuration
@@ -37,7 +38,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
 // Endpoint test đơn giản

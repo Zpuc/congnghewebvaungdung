@@ -170,29 +170,63 @@ namespace MyWebAPI.DAL.Repositories
         }
         public async Task<TaiKhoanDTO?> RegisterReaderAsync(string hoTen, string email, string dienThoai, string matKhauHash)
         {
+            // Một số DB chưa có stored procedure sp_RegisterReader.
+            // Fallback: tự tạo BanDoc + TaiKhoan bằng các SP sẵn có (sp_CreateBanDoc + sp_Register).
             using var con = new SqlConnection(_connStr);
             await con.OpenAsync();
+            using var tx = (SqlTransaction)await con.BeginTransactionAsync();
 
-            using var cmd = new SqlCommand("sp_RegisterReader", con);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            cmd.Parameters.AddWithValue("@HoTen", hoTen);
-            cmd.Parameters.AddWithValue("@Email", email);
-            cmd.Parameters.AddWithValue("@DienThoai", dienThoai);
-            cmd.Parameters.AddWithValue("@MatKhauHash", matKhauHash);
-
-            using var rd = await cmd.ExecuteReaderAsync();
-            if (await rd.ReadAsync())
+            try
             {
+                var maBanDoc = "BD" + Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
+                var soThe = Random.Shared.NextInt64(0, 9_999_999_999L).ToString("D10");
+                var hanThe = DateTime.UtcNow.Date.AddYears(1);
+
+                using (var createBanDoc = new SqlCommand("sp_CreateBanDoc", con, tx))
+                {
+                    createBanDoc.CommandType = CommandType.StoredProcedure;
+                    createBanDoc.Parameters.AddWithValue("@MaBanDoc", maBanDoc);
+                    createBanDoc.Parameters.AddWithValue("@SoThe", soThe);
+                    createBanDoc.Parameters.AddWithValue("@HoTen", hoTen);
+                    createBanDoc.Parameters.AddWithValue("@Email", email);
+                    createBanDoc.Parameters.AddWithValue("@DienThoai", dienThoai);
+                    createBanDoc.Parameters.AddWithValue("@HanThe", hanThe);
+                    createBanDoc.Parameters.AddWithValue("@TrangThaiThe", "Hoạt động");
+                    createBanDoc.Parameters.AddWithValue("@DuNo", 0m);
+
+                    await createBanDoc.ExecuteNonQueryAsync();
+                }
+
+                var maTaiKhoan = "TK" + Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
+                var tenDangNhap = string.IsNullOrWhiteSpace(email) ? ("user" + soThe) : email.Trim();
+
+                using (var createTaiKhoan = new SqlCommand("sp_Register", con, tx))
+                {
+                    createTaiKhoan.CommandType = CommandType.StoredProcedure;
+                    createTaiKhoan.Parameters.AddWithValue("@MaTaiKhoan", maTaiKhoan);
+                    createTaiKhoan.Parameters.AddWithValue("@TenDangNhap", tenDangNhap);
+                    createTaiKhoan.Parameters.AddWithValue("@MatKhau", matKhauHash);
+                    createTaiKhoan.Parameters.AddWithValue("@VaiTro", "Bạn đọc");
+                    createTaiKhoan.Parameters.AddWithValue("@MaBanDoc", maBanDoc);
+
+                    await createTaiKhoan.ExecuteNonQueryAsync();
+                }
+
+                await tx.CommitAsync();
+
                 return new TaiKhoanDTO
                 {
-                    MaTaiKhoan = rd["MaTaiKhoan"].ToString() ?? "",
-                    TenDangNhap = rd["TenDangNhap"].ToString() ?? "",
-                    VaiTro = rd["VaiTro"].ToString() ?? "",
-                    MaBanDoc = rd["MaBanDoc"].ToString() ?? ""
+                    MaTaiKhoan = maTaiKhoan,
+                    TenDangNhap = tenDangNhap,
+                    VaiTro = "Bạn đọc",
+                    MaBanDoc = maBanDoc
                 };
             }
-            return null;
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
         }
 
     }
