@@ -11,6 +11,7 @@ import {
   Table,
   Tag,
   Typography,
+  type TableColumnsType,
 } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import type { BanSao, CreateBanSaoPayload, UpdateBanSaoPayload } from '../../types/ban-sao'
@@ -89,11 +90,33 @@ export function BanSaoPage() {
     })()
   }, [])
 
-  const columns = useMemo(
+  const columns = useMemo<TableColumnsType<BanSao>>(
     () => [
-      { title: 'Mã bản sao', dataIndex: 'maBanSao', key: 'maBanSao', width: 120 },
-      { title: 'Mã vạch', dataIndex: 'maVach', key: 'maVach', width: 140 },
-      { title: 'Mã sách', dataIndex: 'maSach', key: 'maSach', width: 110 },
+      {
+        title: 'STT',
+        key: 'stt',
+        width: 70,
+        align: 'center',
+        render: (_: unknown, __: unknown, index: number) => index + 1,
+      },
+      {
+        title: 'Mã bản sao',
+        dataIndex: 'maBanSao',
+        key: 'maBanSao',
+        width: 120,
+      },
+      {
+        title: 'Mã vạch',
+        dataIndex: 'maVach',
+        key: 'maVach',
+        width: 140,
+      },
+      {
+        title: 'Mã sách',
+        dataIndex: 'maSach',
+        key: 'maSach',
+        width: 110,
+      },
       {
         title: 'Tiêu đề',
         key: 'tieuDe',

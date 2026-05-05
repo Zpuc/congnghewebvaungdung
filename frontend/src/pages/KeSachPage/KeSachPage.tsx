@@ -55,13 +55,30 @@ export function KeSachPage() {
 
   const columns = useMemo<TableColumnsType<KeSach>>(
     () => [
-      { title: 'Mã kệ', dataIndex: 'maKe', key: 'maKe', width: 160 },
-      { title: 'Vị trí', dataIndex: 'viTri', key: 'viTri', ellipsis: true },
+      {
+        title: 'STT',
+        key: 'stt',
+        width: 70,
+        align: 'center',
+        render: (_: unknown, __: unknown, index: number) => index + 1,
+      },
+      {
+        title: 'Mã kệ',
+        dataIndex: 'maKe',
+        key: 'maKe',
+        width: 160,
+      },
+      {
+        title: 'Vị trí',
+        dataIndex: 'viTri',
+        key: 'viTri',
+        ellipsis: true,
+      },
       {
         title: 'Thao tác',
         key: 'actions',
         width: 220,
-        render: (_: unknown, record) => (
+        render: (_: unknown, record: KeSach) => (
           <Space>
             <Button
               onClick={() => {

@@ -340,6 +340,33 @@
         }
       ],
       "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
+    },
+    {
+      "UpstreamPathTemplate": "/api/yeucauthanhtoanphat",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamPathTemplate": "/api/YeuCauThanhToanPhat",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
+    },
+    {
+      "UpstreamPathTemplate": "/api/yeucauthanhtoanphat/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/YeuCauThanhToanPhat/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "Priority": 1,
+      "HttpHandlerOptions": { "DangerousAcceptAnyServerCertificateValidator": true }
     }
 
   ],

@@ -11,6 +11,7 @@ import {
   Table,
   Tag,
   Typography,
+  type TableProps,
 } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import type { CreateSachPayload, Sach, UpdateSachPayload } from '../../types/sach'
@@ -70,9 +71,30 @@ export function BooksPage() {
 
   const columns = useMemo(
     () => [
-      { title: 'Mã sách', dataIndex: 'maSach', key: 'maSach', width: 120 },
-      { title: 'Tiêu đề', dataIndex: 'tieuDe', key: 'tieuDe' },
-      { title: 'Tác giả', dataIndex: 'tacGia', key: 'tacGia', width: 180 },
+      {
+        title: 'STT',
+        key: 'stt',
+        width: 70,
+        align: 'center' as const,
+        render: (_: unknown, __: unknown, index: number) => index + 1,
+      },
+      {
+        title: 'Mã sách',
+        dataIndex: 'maSach',
+        key: 'maSach',
+        width: 120,
+      },
+      {
+        title: 'Tiêu đề',
+        dataIndex: 'tieuDe',
+        key: 'tieuDe',
+      },
+      {
+        title: 'Tác giả',
+        dataIndex: 'tacGia',
+        key: 'tacGia',
+        width: 180,
+      },
       {
         title: 'Năm XB',
         dataIndex: 'namXuatBan',

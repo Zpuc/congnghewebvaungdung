@@ -55,8 +55,24 @@ export function CategoriesPage() {
 
   const columns = useMemo<TableColumnsType<TheLoaiItem>>(
     () => [
-      { title: 'Mã thể loại', dataIndex: 'maTheLoai', key: 'maTheLoai', width: 180 },
-      { title: 'Tên thể loại', dataIndex: 'tenTheLoai', key: 'tenTheLoai' },
+      {
+        title: 'STT',
+        key: 'stt',
+        width: 70,
+        align: 'center',
+        render: (_: unknown, __: unknown, index: number) => index + 1,
+      },
+      {
+        title: 'Mã thể loại',
+        dataIndex: 'maTheLoai',
+        key: 'maTheLoai',
+        width: 180,
+      },
+      {
+        title: 'Tên thể loại',
+        dataIndex: 'tenTheLoai',
+        key: 'tenTheLoai',
+      },
       {
         title: 'Thao tác',
         key: 'actions',
