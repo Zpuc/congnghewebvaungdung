@@ -1,0 +1,6 @@
+export { TrangChuPage } from './TrangChuPage'
+export { GioiThieuPage } from './GioiThieuPage'
+export { ChinhSachPage } from './ChinhSachPage'
+export { GioHangPage } from './GioHangPage'
+export { MuonSachPage } from './MuonSachPage'
+export { LichSuMuonPage } from './LichSuMuonPage'

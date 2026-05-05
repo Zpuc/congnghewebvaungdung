@@ -8,11 +8,11 @@ import {
   Carousel,
   Tag,
   Space,
-  Image,
 } from 'antd'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getAllSach } from '../../services/sach-api'
+import { getAllBanSao } from '../../services/ban-sao-api'
 import type { Sach } from '../../types/sach'
 
 const { Title, Paragraph } = Typography
@@ -20,16 +20,31 @@ const { Title, Paragraph } = Typography
 export function TrangChuPage() {
   const { message } = AntApp.useApp()
   const navigate = useNavigate()
-  const [sachNoiBat, setSachNoiBat] = useState<Sach[]>([])
+  const [sachNoiBat, setSachNoiBat] = useState<(Sach & { soLuong: number })[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     void (async () => {
       setLoading(true)
       try {
-        const res = await getAllSach()
-        // Lấy 8 sách đầu tiên làm nổi bật
-        setSachNoiBat(res.data?.slice(0, 8) ?? [])
+        const [sRes, bsRes] = await Promise.all([getAllSach(), getAllBanSao()])
+        const sachList = sRes.data ?? []
+        const banSaoList = bsRes.data ?? []
+
+        // Đếm số bản có sẵn cho mỗi sách
+        const soLuongMap = new Map<string, number>()
+        for (const bs of banSaoList) {
+          if (bs.trangThai === 'Có sẵn') {
+            soLuongMap.set(bs.maSach, (soLuongMap.get(bs.maSach) ?? 0) + 1)
+          }
+        }
+
+        // Kết hợp sách với số lượng
+        const sachWithCount = sachList
+          .slice(0, 8)
+          .map((s) => ({ ...s, soLuong: soLuongMap.get(s.maSach) ?? 0 }))
+
+        setSachNoiBat(sachWithCount)
       } catch (e) {
         const text = e instanceof Error ? e.message : 'Không tải được sách'
         message.error(text)
@@ -39,85 +54,79 @@ export function TrangChuPage() {
     })()
   }, [message])
 
-  const carouselItems = [
-    {
-      key: '1',
-      label: (
-        <div
-          style={{
-            height: 400,
-            color: 'white',
-            lineHeight: '400px',
-            textAlign: 'center',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          }}
-        >
-          <Title level={2} style={{ color: 'white', margin: 0 }}>
-            📚 Thư viện số - Nơi tri thức lan tỏa
-          </Title>
-          <Paragraph style={{ color: 'rgba(255,255,255,0.9)', fontSize: 18 }}>
-            Khám phá hàng ngàn đầu sách với dịch vụ thuê mượn tiện lợi
-          </Paragraph>
-          <Button type="primary" size="large" onClick={() => navigate('/thue-sach/sach')}>
-            Xem ngay
-          </Button>
-        </div>
-      ),
-    },
-    {
-      key: '2',
-      label: (
-        <div
-          style={{
-            height: 400,
-            color: 'white',
-            lineHeight: '400px',
-            textAlign: 'center',
-            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-          }}
-        >
-          <Title level={2} style={{ color: 'white', margin: 0 }}>
-            🏠 Thuê sách tại nhà - Giao tận tay
-          </Title>
-          <Paragraph style={{ color: 'rgba(255,255,255,0.9)', fontSize: 18 }}>
-            Đặt mượn sách dễ dàng, nhận tận nơi, trả lại linh hoạt
-          </Paragraph>
-          <Button type="primary" size="large" onClick={() => navigate('/thue-sach/muon-sach')}>
-            Đặt mượn ngay
-          </Button>
-        </div>
-      ),
-    },
-    {
-      key: '3',
-      label: (
-        <div
-          style={{
-            height: 400,
-            color: 'white',
-            lineHeight: '400px',
-            textAlign: 'center',
-            background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-          }}
-        >
-          <Title level={2} style={{ color: 'white', margin: 0 }}>
-            ⭐ Dịch vụ chuyên nghiệp
-          </Title>
-          <Paragraph style={{ color: 'rgba(255,255,255,0.9)', fontSize: 18 }}>
-            Hỗ trợ 24/7 - Phạt hạn trễ hợp lý - Đổi trả dễ dàng
-          </Paragraph>
-          <Button type="primary" size="large" onClick={() => navigate('/thue-sach/chinh-sach')}>
-            Tìm hiểu thêm
-          </Button>
-        </div>
-      ),
-    },
+  const carouselContent = [
+    (
+      <div
+        key="1"
+        style={{
+          height: 400,
+          color: 'white',
+          lineHeight: '400px',
+          textAlign: 'center',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        }}
+      >
+        <Title level={2} style={{ color: 'white', margin: 0 }}>
+          📚 Thư viện số - Nơi tri thức lan tỏa
+        </Title>
+        <Paragraph style={{ color: 'rgba(255,255,255,0.9)', fontSize: 18 }}>
+          Khám phá hàng ngàn đầu sách với dịch vụ thuê mượn tiện lợi
+        </Paragraph>
+        <Button type="primary" size="large" onClick={() => navigate('/thue-sach/muon-sach')}>
+          Xem ngay
+        </Button>
+      </div>
+    ),
+    (
+      <div
+        key="2"
+        style={{
+          height: 400,
+          color: 'white',
+          lineHeight: '400px',
+          textAlign: 'center',
+          background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        }}
+      >
+        <Title level={2} style={{ color: 'white', margin: 0 }}>
+          🏠 Thuê sách tại nhà - Giao tận tay
+        </Title>
+        <Paragraph style={{ color: 'rgba(255,255,255,0.9)', fontSize: 18 }}>
+          Đặt mượn sách dễ dàng, nhận tận nơi, trả lại linh hoạt
+        </Paragraph>
+        <Button type="primary" size="large" onClick={() => navigate('/thue-sach/muon-sach')}>
+          Đặt mượn ngay
+        </Button>
+      </div>
+    ),
+    (
+      <div
+        key="3"
+        style={{
+          height: 400,
+          color: 'white',
+          lineHeight: '400px',
+          textAlign: 'center',
+          background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        }}
+      >
+        <Title level={2} style={{ color: 'white', margin: 0 }}>
+          ⭐ Dịch vụ chuyên nghiệp
+        </Title>
+        <Paragraph style={{ color: 'rgba(255,255,255,0.9)', fontSize: 18 }}>
+          Hỗ trợ 24/7 - Phạt hạn trễ hợp lý - Đổi trả dễ dàng
+        </Paragraph>
+        <Button type="primary" size="large" onClick={() => navigate('/thue-sach/chinh-sach')}>
+          Tìm hiểu thêm
+        </Button>
+      </div>
+    ),
   ]
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px' }}>
       {/* Carousel banner */}
-      <Carousel autoplay style={{ marginBottom: 48 }}>{carouselItems}</Carousel>
+      <Carousel autoplay style={{ marginBottom: 48 }}>{carouselContent}</Carousel>
 
       {/* Giới thiệu nhanh */}
       <Card
@@ -163,7 +172,8 @@ export function TrangChuPage() {
       <Card
         title="📚 Sách nổi bật"
         style={{ marginBottom: 32 }}
-        extra={<Button type="link" onClick={() => navigate('/thue-sach/sach')}>Xem tất cả →</Button>}
+        extra={<Button type="link" onClick={() => navigate('/thue-sach/muon-sach')}>Xem tất cả →</Button>}
+        loading={loading}
       >
         <Row gutter={[16, 16]}>
           {sachNoiBat.map((sach) => (
@@ -185,7 +195,7 @@ export function TrangChuPage() {
                   </div>
                 }
                 bodyStyle={{ padding: 12 }}
-                onClick={() => navigate(`/thue-sach/sach/${sach.maSach}`)}
+                onClick={() => navigate('/thue-sach/muon-sach')}
               >
                 <Typography.Text strong ellipsis style={{ display: 'block', fontSize: 14 }}>
                   {sach.tieuDe}
@@ -194,7 +204,7 @@ export function TrangChuPage() {
                   {sach.tacGia}
                 </Typography.Text>
                 <Space style={{ marginTop: 8 }}>
-                  <Tag color="blue">{sach.theLoai}</Tag>
+                  <Tag color="blue">{sach.theLoai || 'Chưa phân loại'}</Tag>
                   <Tag color="green">{sach.soLuong} còn</Tag>
                 </Space>
               </Card>

@@ -11,7 +11,6 @@ import {
   Table,
   Tag,
   Typography,
-  type TableProps,
 } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import type { CreateSachPayload, Sach, UpdateSachPayload } from '../../types/sach'
