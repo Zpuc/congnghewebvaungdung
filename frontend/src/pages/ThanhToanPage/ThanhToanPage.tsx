@@ -12,12 +12,12 @@ const money = new Intl.NumberFormat('vi-VN', {
 })
 
 export function ThanhToanPage() {
-  const { message, modal } = AntApp.useApp()
+  const { message } = AntApp.useApp()
   const [choDuyet, setChoDuyet] = useState<YeuCauThanhToanPhat[]>([])
   const [lichSu, setLichSu] = useState<ThanhToan[]>([])
   const [loadingCho, setLoadingCho] = useState(false)
   const [loadingLs, setLoadingLs] = useState(false)
-  const [duyetKey, setDuyetKey] = useState<string | null>(null)
+  const [loadingButtons, setLoadingButtons] = useState<Set<string>>(new Set())
 
   const loadChoDuyet = useCallback(async () => {
     setLoadingCho(true)
@@ -47,44 +47,25 @@ export function ThanhToanPage() {
   }, [loadChoDuyet, loadLichSu])
 
   const onDuyet = useCallback(
-    (row: YeuCauThanhToanPhat) => {
-      modal.confirm({
-      title: 'Duyệt thanh toán phạt?',
-      content: (
-        <div>
-          <Typography.Paragraph style={{ marginBottom: 8 }}>
-            Mã yêu cầu: <strong>{row.maYeuCau}</strong>
-            <br />
-            Mã phạt: <strong>{row.maPhat}</strong> — Bạn đọc: <strong>{row.maBanDoc}</strong>
-            <br />
-            Số tiền: <strong>{money.format(row.soTien)}</strong> — Hình thức:{' '}
-            <strong>{row.hinhThuc}</strong>
-          </Typography.Paragraph>
-          <Typography.Text type="secondary">
-            Sau khi duyệt: ghi bản ghi thanh toán, cấp mã thanh toán cho bạn đọc và xóa khoản phạt
-            tương ứng.
-          </Typography.Text>
-        </div>
-      ),
-      okText: 'Duyệt thanh toán',
-      cancelText: 'Hủy',
-      onOk: async () => {
-        setDuyetKey(row.maYeuCau)
-        try {
-          const res = await duyetYeuCauThanhToan(row.maYeuCau)
-          message.success(`Đã duyệt. Mã thanh toán: ${res.maThanhToan}`)
-          await loadChoDuyet()
-          await loadLichSu()
-        } catch (e) {
-          message.error(e instanceof Error ? e.message : 'Duyệt thất bại')
-          throw e
-        } finally {
-          setDuyetKey(null)
-        }
-      },
-    })
+    async (row: YeuCauThanhToanPhat) => {
+      const maYeuCau = row.maYeuCau
+      setLoadingButtons((prev) => new Set(prev).add(maYeuCau))
+      try {
+        const res = await duyetYeuCauThanhToan(maYeuCau)
+        message.success(`Đã duyệt. Mã thanh toán: ${res.maThanhToan}`)
+        await loadChoDuyet()
+        await loadLichSu()
+      } catch (e) {
+        message.error(e instanceof Error ? e.message : 'Duyệt thất bại')
+      } finally {
+        setLoadingButtons((prev) => {
+          const next = new Set(prev)
+          next.delete(maYeuCau)
+          return next
+        })
+      }
     },
-    [loadChoDuyet, loadLichSu, message, modal],
+    [loadChoDuyet, loadLichSu, message],
   )
 
   const colsCho = useMemo(
@@ -125,7 +106,7 @@ export function ThanhToanPage() {
           <Button
             type="primary"
             size="small"
-            loading={duyetKey === r.maYeuCau}
+            loading={loadingButtons.has(r.maYeuCau)}
             onClick={() => onDuyet(r)}
           >
             Duyệt thanh toán
@@ -133,7 +114,7 @@ export function ThanhToanPage() {
         ),
       },
     ],
-    [duyetKey, onDuyet],
+    [onDuyet],
   )
 
   const colsLs = useMemo(

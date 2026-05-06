@@ -40,3 +40,34 @@ export async function loginApi(payload: LoginRequest) {
   }
 }
 
+export async function registerReaderApi(payload: {
+  hoTen: string
+  email: string
+  dienThoai: string
+  matKhau: string
+}) {
+  try {
+    const { data } = await http.post<any>('/api/DangNhap/register-reader', {
+      HoTen: payload.hoTen,
+      Email: payload.email,
+      DienThoai: payload.dienThoai,
+      MatKhau: payload.matKhau,
+    })
+
+    if (!data?.success) {
+      throw new Error(data?.message || 'Đăng ký thất bại')
+    }
+
+    return data
+  } catch (error) {
+    if (isAxiosError(error)) {
+      const apiMessage = (error.response?.data as { message?: string } | undefined)?.message
+      if (apiMessage) {
+        throw new Error(apiMessage)
+      }
+    }
+
+    throw new Error('Không thể đăng ký, vui lòng thử lại.')
+  }
+}
+

@@ -1,6 +1,7 @@
 import { App as AntApp, ConfigProvider } from 'antd'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { LoginPage } from './pages/LoginPage/LoginPage'
+import { RegisterPage } from './pages/RegisterPage/RegisterPage'
 import { AdminPage } from './pages/AdminPage/AdminPage'
 import { LibrarianPage } from './pages/LibrarianPage/LibrarianPage'
 import { ReaderPage } from './pages/ReaderPage/ReaderPage'
@@ -19,9 +20,8 @@ import { ThueSachLayout } from './layouts/ThueSachLayout'
 import { TrangChuPage } from './pages/ThueSachPage/TrangChuPage'
 import { GioiThieuPage } from './pages/ThueSachPage/GioiThieuPage'
 import { ChinhSachPage } from './pages/ThueSachPage/ChinhSachPage'
-import { GioHangPage } from './pages/ThueSachPage/GioHangPage'
-import { MuonSachPage } from './pages/ThueSachPage/MuonSachPage'
 import { LichSuMuonPage } from './pages/ThueSachPage/LichSuMuonPage'
+import { ChiTietSachPage } from './pages/ThueSachPage/ChiTietSachPage'
 import './App.css'
 
 export default function App() {
@@ -37,15 +37,15 @@ export default function App() {
       <AntApp>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
           {/* Phần thuê sách công khai */}
           <Route path="/thue-sach" element={<ThueSachLayout />}>
             <Route index element={<TrangChuPage />} />
             <Route path="gioi-thieu" element={<GioiThieuPage />} />
             <Route path="chinh-sach" element={<ChinhSachPage />} />
-            <Route path="gio-hang" element={<GioHangPage />} />
-            <Route path="muon-sach" element={<MuonSachPage />} />
             <Route path="lich-su-muon" element={<LichSuMuonPage />} />
+            <Route path="chi-tiet/:maSach" element={<ChiTietSachPage />} />
           </Route>
 
           <Route

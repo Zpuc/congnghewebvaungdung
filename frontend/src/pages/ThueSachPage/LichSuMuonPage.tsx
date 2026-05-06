@@ -1,6 +1,5 @@
 import {
   App as AntApp,
-  Button,
   Card,
   Table,
   Tag,
@@ -12,6 +11,7 @@ import {
   Space,
 } from 'antd'
 import { useEffect, useState } from 'react'
+import { useAuth } from '../../auth/AuthContext'
 import { getAllPhieuMuon } from '../../services/phieu-muon-api'
 import { traSachVaTinhPhat } from '../../services/phieu-muon-api'
 import type { PhieuMuon } from '../../types/phieu-muon'
@@ -21,6 +21,7 @@ const { Title, Text } = Typography
 
 export function LichSuMuonPage() {
   const { message: antMessage } = AntApp.useApp()
+  const { user } = useAuth()
   const [phieuMuonList, setPhieuMuonList] = useState<PhieuMuon[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedPhieu, setSelectedPhieu] = useState<PhieuMuon | null>(null)
@@ -31,7 +32,14 @@ export function LichSuMuonPage() {
     setLoading(true)
     try {
       const res = await getAllPhieuMuon()
-      setPhieuMuonList(res.data ?? [])
+      let data = res.data ?? []
+
+      // Filter: Readers only see their own borrowing records
+      if (user?.vaiTro === 'Bạn đọc' && user?.maBanDoc) {
+        data = data.filter((pm) => pm.maBanDoc === user.maBanDoc)
+      }
+
+      setPhieuMuonList(data)
     } catch (e) {
       const text = e instanceof Error ? e.message : 'Không tải được danh sách phiếu mượn'
       antMessage.error(text)
@@ -133,26 +141,6 @@ export function LichSuMuonPage() {
             : 'default'
         return <Tag color={color}>{value}</Tag>
       },
-    },
-    {
-      title: 'Thao tác',
-      key: 'actions',
-      width: 150,
-      render: (_: unknown, record: PhieuMuon) => (
-        <Space>
-          <Button
-            size="small"
-            onClick={() => {
-              setSelectedPhieu(record)
-              setTraNgay(dayjs())
-              setTraModalOpen(true)
-            }}
-            disabled={record.trangThai === 'Đã trả' || record.trangThai === 'Đang xử lý'}
-          >
-            Trả sách
-          </Button>
-        </Space>
-      ),
     },
   ]
 

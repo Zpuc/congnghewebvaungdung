@@ -12,18 +12,14 @@ import {
   Tag,
   Typography,
   Image,
-  Upload,
 } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
-import { PlusOutlined } from '@ant-design/icons'
 import type { CreateSachPayload, Sach, UpdateSachPayload } from '../../types/sach'
 import {
   createSach,
-  createSachWithImage,
   deleteSach,
   getAllSach,
   updateSach,
-  uploadSachImage,
 } from '../../services/sach-api'
 import { getAllTheLoai } from '../../services/the-loai-api'
 
@@ -34,6 +30,7 @@ type FormValues = {
   maTheLoai?: string
   ngonNgu?: string
   tomTat?: string
+  anhBiaUrl?: string
 }
 
 type TheLoaiOption = {
@@ -50,8 +47,7 @@ export function BooksPage() {
   const [editing, setEditing] = useState<Sach | null>(null)
   const [theLoaiOptions, setTheLoaiOptions] = useState<TheLoaiOption[]>([])
   const [form] = Form.useForm<FormValues>()
-  const [previewImage, setPreviewImage] = useState<string | null>(null)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const anhBiaUrl = Form.useWatch('anhBiaUrl', form)
 
   const mode = editing ? 'edit' : 'create'
 
@@ -158,15 +154,8 @@ export function BooksPage() {
                   maTheLoai: record.maTheLoai ?? undefined,
                   ngonNgu: record.ngonNgu ?? undefined,
                   tomTat: record.tomTat ?? undefined,
+                  anhBiaUrl: record.anhBiaUrl ?? undefined,
                 })
-                setSelectedFile(null)
-                setPreviewImage(
-                  record.anhBiaUrl?.startsWith('http')
-                    ? record.anhBiaUrl
-                    : record.anhBiaUrl
-                    ? `http://localhost:5001${record.anhBiaUrl}`
-                    : null
-                )
                 setOpen(true)
               }}
             >
@@ -199,19 +188,8 @@ export function BooksPage() {
 
   const onCreateClick = () => {
     setEditing(null)
-    setPreviewImage(null)
-    setSelectedFile(null)
     form.resetFields()
     setOpen(true)
-  }
-
-  const handleImageChange = (file: File) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setPreviewImage(e.target?.result as string)
-    }
-    reader.readAsDataURL(file)
-    setSelectedFile(file)
   }
 
   const onSubmit = async () => {
@@ -220,30 +198,17 @@ export function BooksPage() {
       setSaving(true)
 
       if (mode === 'create') {
-        if (selectedFile) {
-          const formData = new FormData()
-          formData.append('TieuDe', values.tieuDe)
-          formData.append('TacGia', values.tacGia)
-          if (values.namXuatBan) formData.append('NamXuatBan', values.namXuatBan.toString())
-          if (values.maTheLoai) formData.append('MaTheLoai', values.maTheLoai)
-          if (values.ngonNgu) formData.append('NgonNgu', values.ngonNgu)
-          if (values.tomTat) formData.append('TomTat', values.tomTat)
-          formData.append('Image', selectedFile)
-
-          await createSachWithImage(formData)
-          antMessage.success('Thêm sách thành công với ảnh bìa')
-        } else {
-          const payload: CreateSachPayload = {
-            tieuDe: values.tieuDe,
-            tacGia: values.tacGia,
-            namXuatBan: values.namXuatBan ?? null,
-            maTheLoai: values.maTheLoai?.trim() || null,
-            ngonNgu: values.ngonNgu?.trim() || null,
-            tomTat: values.tomTat?.trim() || null,
-          }
-          await createSach(payload)
-          antMessage.success('Thêm sách thành công')
+        const payload: CreateSachPayload = {
+          tieuDe: values.tieuDe,
+          tacGia: values.tacGia,
+          namXuatBan: values.namXuatBan ?? null,
+          maTheLoai: values.maTheLoai?.trim() || null,
+          ngonNgu: values.ngonNgu?.trim() || null,
+          tomTat: values.tomTat?.trim() || null,
+          anhBiaUrl: values.anhBiaUrl?.trim() || null,
         }
+        await createSach(payload)
+        antMessage.success('Thêm sách thành công')
       } else if (editing) {
         const payload: UpdateSachPayload = {
           tieuDe: values.tieuDe,
@@ -252,22 +217,15 @@ export function BooksPage() {
           maTheLoai: values.maTheLoai?.trim() || null,
           ngonNgu: values.ngonNgu?.trim() || null,
           tomTat: values.tomTat?.trim() || null,
+          anhBiaUrl: values.anhBiaUrl?.trim() || null,
         }
         await updateSach(editing.maSach, payload)
-
-        if (selectedFile) {
-          await uploadSachImage(editing.maSach, selectedFile)
-          antMessage.success('Cập nhật sách và ảnh bìa thành công')
-        } else {
-          antMessage.success('Cập nhật sách thành công')
-        }
+        antMessage.success('Cập nhật sách thành công')
       }
 
       setOpen(false)
       form.resetFields()
       setEditing(null)
-      setPreviewImage(null)
-      setSelectedFile(null)
       await fetchData()
     } catch (e) {
       if (e instanceof Error) {
@@ -361,40 +319,13 @@ export function BooksPage() {
           <Form.Item label="Tóm tắt" name="tomTat">
             <Input.TextArea rows={3} />
           </Form.Item>
-          <Form.Item label="Ảnh bìa">
-            <Upload
-              beforeUpload={() => false}
-              onChange={(info) => {
-                const file = info.file.originFileObj
-                if (file) {
-                  handleImageChange(file)
-                }
-              }}
-              maxCount={1}
-              fileList={
-                selectedFile
-                  ? [
-                      {
-                        uid: '-1',
-                        name: selectedFile.name,
-                        status: 'done' as const,
-                        originFileObj: selectedFile as any,
-                      },
-                    ]
-                  : []
-              }
-              onRemove={() => {
-                setSelectedFile(null)
-                setPreviewImage(null)
-              }}
-            >
-              <Button icon={<PlusOutlined />}>Chọn ảnh</Button>
-            </Upload>
+          <Form.Item label="URL ảnh bìa" name="anhBiaUrl">
+            <Input placeholder="Dán link ảnh từ Google, VD: https://..." />
           </Form.Item>
-          {previewImage && (
+          {anhBiaUrl && (
             <div style={{ marginTop: 8 }}>
               <img
-                src={previewImage}
+                src={anhBiaUrl}
                 alt="Preview"
                 style={{
                   maxWidth: '100%',
@@ -402,6 +333,9 @@ export function BooksPage() {
                   objectFit: 'contain',
                   border: '1px solid #d9d9d9',
                   borderRadius: 4,
+                }}
+                onError={(e) => {
+                  ;(e.target as HTMLImageElement).style.display = 'none'
                 }}
               />
             </div>

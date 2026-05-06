@@ -8,6 +8,7 @@ import {
   Carousel,
   Tag,
   Space,
+  Image,
 } from 'antd'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -72,7 +73,7 @@ export function TrangChuPage() {
         <Paragraph style={{ color: 'rgba(255,255,255,0.9)', fontSize: 18 }}>
           Khám phá hàng ngàn đầu sách với dịch vụ thuê mượn tiện lợi
         </Paragraph>
-        <Button type="primary" size="large" onClick={() => navigate('/thue-sach/muon-sach')}>
+        <Button type="primary" size="large" onClick={() => navigate('/thue-sach')}>
           Xem ngay
         </Button>
       </div>
@@ -94,7 +95,7 @@ export function TrangChuPage() {
         <Paragraph style={{ color: 'rgba(255,255,255,0.9)', fontSize: 18 }}>
           Đặt mượn sách dễ dàng, nhận tận nơi, trả lại linh hoạt
         </Paragraph>
-        <Button type="primary" size="large" onClick={() => navigate('/thue-sach/muon-sach')}>
+        <Button type="primary" size="large" onClick={() => navigate('/thue-sach')}>
           Đặt mượn ngay
         </Button>
       </div>
@@ -132,11 +133,11 @@ export function TrangChuPage() {
       <Card
         title="Tại sao chọn chúng tôi?"
         style={{ marginBottom: 32, textAlign: 'center' }}
-        headStyle={{ textAlign: 'center' }}
+        styles={{ header: { textAlign: 'center' } }}
       >
         <Row gutter={[24, 24]}>
           <Col xs={24} sm={12} md={6}>
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
               <Typography.Title level={3} style={{ margin: 0 }}>📖</Typography.Title>
               <Title level={4}>Đa dạng sách</Title>
               <Paragraph>
@@ -145,21 +146,21 @@ export function TrangChuPage() {
             </Space>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
               <Typography.Title level={3} style={{ margin: 0 }}>🚚</Typography.Title>
               <Title level={4}>Giao hàng nhanh</Title>
               <Paragraph>Miễn phí giao sách tận nhà trong 24-48 giờ</Paragraph>
             </Space>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
               <Typography.Title level={3} style={{ margin: 0 }}>💰</Typography.Title>
               <Title level={4}>Giá cả hợp lý</Title>
               <Paragraph>Thuê theo tuần/tháng với mức giá ưu đãi</Paragraph>
             </Space>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
               <Typography.Title level={3} style={{ margin: 0 }}>🎧</Typography.Title>
               <Title level={4}>Hỗ trợ 24/7</Title>
               <Paragraph>Đội ngũ tư vấn luôn sẵn sàng phục vụ</Paragraph>
@@ -170,9 +171,8 @@ export function TrangChuPage() {
 
       {/* Sách nổi bật */}
       <Card
-        title="📚 Sách nổi bật"
+        title=" Sách nổi bật"
         style={{ marginBottom: 32 }}
-        extra={<Button type="link" onClick={() => navigate('/thue-sach/muon-sach')}>Xem tất cả →</Button>}
         loading={loading}
       >
         <Row gutter={[16, 16]}>
@@ -181,21 +181,33 @@ export function TrangChuPage() {
               <Card
                 hoverable
                 cover={
-                  <div
-                    style={{
-                      height: 200,
-                      background: 'linear-gradient(135deg, #667eea15 0%, #764ba215 100%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 48,
-                    }}
-                  >
-                    📕
-                  </div>
+                  sach.anhBiaUrl ? (
+                    <Image
+                      src={sach.anhBiaUrl.startsWith('http') ? sach.anhBiaUrl : `http://localhost:5001${sach.anhBiaUrl}`}
+                      alt={sach.tieuDe}
+                      style={{ height: 200, objectFit: 'cover' }}
+                      fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6C3YG3R5cIjOOQmmIhkhJSUZ3VqLOtpCJ+wg7PT9J3XX6cAYHkEbXY4wuHF0QBx7TkVgC9APIFqR1nIIugbqGxYERQ1EMBEAg0xAUFkS1Cp6ZmHkzEAhjFFfLB2RZ1sH0I7jGqgR0GziTdNvod1Fg2GzBxWkF0PiJMgiiLhM3tSICn6tOLf6Vp2dNndD4G7MxdGghcRYDkGkA5XnDfRfvguyDRvLpDBKkZvg3gBqZF4nsj2G+0R4Uq7aRSjGR9zJ4F/mMc3kM8YcYwlE3K4HpGjY4VlH6a4I7z1WkZ9WkH8NkD6BRg6sD6Lq5p7HxQY7pR1l4Ea7J3xWg6aXqKxVpBVVwG8LzGj1v7G/39P/58R4GehM0GkXR8T6V0LqLcXxV2vCwAAAABJRU5ErkJggg=="
+                      onError={(e) => {
+                        ; (e.target as HTMLImageElement).style.display = 'none'
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        height: 200,
+                        background: 'linear-gradient(135deg, #667eea15 0%, #764ba215 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 48,
+                      }}
+                    >
+                      📕
+                    </div>
+                  )
                 }
-                bodyStyle={{ padding: 12 }}
-                onClick={() => navigate('/thue-sach/muon-sach')}
+                styles={{ body: { padding: 12 } }}
+                onClick={() => navigate(`/thue-sach/chi-tiet/${sach.maSach}`)}
               >
                 <Typography.Text strong ellipsis style={{ display: 'block', fontSize: 14 }}>
                   {sach.tieuDe}
@@ -226,10 +238,10 @@ export function TrangChuPage() {
           Đăng ký tài khoản để thuê sách ngay hôm nay
         </Paragraph>
         <Space size="large">
-          <Button type="primary" size="large" onClick={() => navigate('/thue-sach/muon-sach')}>
+          <Button type="primary" size="large" onClick={() => navigate('/thue-sach')}>
             Thuê sách ngay
           </Button>
-          <Button size="large" onClick={() => navigate('/thue-sach/gioi-thieu')}>
+          <Button size="large" onClick={() => navigate('/thue-sach/chinh-sach')}>
             Tìm hiểu thêm
           </Button>
         </Space>

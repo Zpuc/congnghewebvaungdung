@@ -3,7 +3,6 @@ import {
   HomeOutlined,
   InfoCircleOutlined,
   FileTextOutlined,
-  ShoppingCartOutlined,
   BookOutlined,
   LoginOutlined,
   UserOutlined,
@@ -11,7 +10,6 @@ import {
   CrownOutlined,
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { useState, useEffect } from 'react'
 import { useAuth } from '../auth/AuthContext'
 
 const { Header, Content, Footer } = Layout
@@ -21,32 +19,6 @@ export function ThueSachLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const { user, logout: authLogout } = useAuth()
-  const [cartCount, setCartCount] = useState(0)
-
-  useEffect(() => {
-    const updateCartCount = () => {
-      const savedCart = localStorage.getItem('thue-sach-cart')
-      if (savedCart) {
-        try {
-          const cart = JSON.parse(savedCart) as unknown[]
-          setCartCount(cart.length)
-        } catch {
-          setCartCount(0)
-        }
-      } else {
-        setCartCount(0)
-      }
-    }
-
-    updateCartCount()
-    window.addEventListener('storage', updateCartCount)
-    const interval = setInterval(updateCartCount, 1000)
-
-    return () => {
-      window.removeEventListener('storage', updateCartCount)
-      clearInterval(interval)
-    }
-  }, [])
 
   const menuItems = [
     {
@@ -65,19 +37,9 @@ export function ThueSachLayout() {
       label: 'Chính sách',
     },
     {
-      key: '/thue-sach/muon-sach',
-      icon: <BookOutlined />,
-      label: 'Mượn sách',
-    },
-    {
       key: '/thue-sach/lich-su-muon',
       icon: <BookOutlined />,
       label: 'Lịch sử mượn',
-    },
-    {
-      key: '/thue-sach/gio-hang',
-      icon: <ShoppingCartOutlined />,
-      label: `Giỏ hàng ${cartCount > 0 ? `(${cartCount})` : ''}`,
     },
   ]
 
@@ -114,7 +76,7 @@ export function ThueSachLayout() {
             selectedKeys={[location.pathname]}
             items={menuItems}
             onClick={({ key }) => navigate(key)}
-            style={{ flex: 1, minWidth: 0, border: 'none' }}
+            style={{ flexShrink: 0, border: 'none', minWidth: 'max-content', paddingInline: 8 }}
           />
         </div>
         <Space>
@@ -174,11 +136,11 @@ export function ThueSachLayout() {
       </Content>
 
       <Footer style={{ textAlign: 'center', background: '#001529', color: 'white' }}>
-        <Space direction="vertical" size="small">
+        <Space orientation="vertical" size={8}>
           <Text style={{ color: 'white' }}>
             Thư viện số ©{new Date().getFullYear()} - Nơi tri thức lan tỏa
           </Text>
-          <Space split="|">
+          <Space size="middle">
             <Text style={{ color: 'rgba(255,255,255,0.65)', cursor: 'pointer' }}>
               Liên hệ: 0123-456-789
             </Text>

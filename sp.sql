@@ -14,7 +14,7 @@ BEGIN
         tl.TenTheLoai AS TheLoai,
         s.NgonNgu,
         s.TomTat,
-        CAST(NULL AS NVARCHAR(MAX)) AS AnhBiaUrl
+        s.HinhAnh
     FROM dbo.Sach s
     LEFT JOIN dbo.TheLoai tl ON s.MaTheLoai = tl.MaTheLoai;
 END
@@ -34,7 +34,7 @@ BEGIN
         tl.TenTheLoai AS TheLoai,
         s.NgonNgu,
         s.TomTat,
-        CAST(NULL AS NVARCHAR(MAX)) AS AnhBiaUrl
+        s.HinhAnh
     FROM dbo.Sach s
     LEFT JOIN dbo.TheLoai tl ON s.MaTheLoai = tl.MaTheLoai
     WHERE s.MaSach = @MaSach;
@@ -49,11 +49,11 @@ CREATE OR ALTER PROCEDURE sp_InsertSach
     @MaTheLoai NVARCHAR(20) = NULL,
     @NgonNgu NVARCHAR(50) = NULL,
     @TomTat NVARCHAR(MAX) = NULL,
-    @LienKetAnh NVARCHAR(MAX) = NULL
+    @HinhAnh NVARCHAR(500) = NULL
 AS
 BEGIN
-    INSERT INTO dbo.Sach (MaSach, TieuDe, TacGia, NamXuatBan, MaTheLoai, NgonNgu, TomTat)
-    VALUES (@MaSach, @TieuDe, @TacGia, @NamXuatBan, @MaTheLoai, @NgonNgu, @TomTat);
+    INSERT INTO dbo.Sach (MaSach, TieuDe, TacGia, NamXuatBan, MaTheLoai, NgonNgu, TomTat, HinhAnh)
+    VALUES (@MaSach, @TieuDe, @TacGia, @NamXuatBan, @MaTheLoai, @NgonNgu, @TomTat, @HinhAnh);
 END
 
 
@@ -66,7 +66,7 @@ CREATE OR ALTER PROCEDURE sp_UpdateSach
     @MaTheLoai NVARCHAR(20) = NULL,
     @NgonNgu NVARCHAR(50) = NULL,
     @TomTat NVARCHAR(MAX) = NULL,
-    @LienKetAnh NVARCHAR(MAX) = NULL
+    @HinhAnh NVARCHAR(500) = NULL
 AS
 BEGIN
     UPDATE Sach
@@ -75,7 +75,8 @@ BEGIN
         NamXuatBan = @NamXuatBan,
         MaTheLoai = @MaTheLoai,
         NgonNgu = @NgonNgu,
-        TomTat = @TomTat
+        TomTat,
+        HinhAnh = @HinhAnh = @TomTat
     WHERE MaSach = @MaSach;
 END
 
@@ -284,6 +285,10 @@ CREATE OR ALTER PROCEDURE sp_DeletePhieuMuon
 AS
 BEGIN
     SET NOCOUNT ON;
+    -- Xóa các phạt liên quan trước (cascade delete thủ công)
+    DELETE FROM dbo.Phat
+    WHERE MaPhieuMuon = @MaPhieuMuon;
+    -- Xóa phiếu mượn
     DELETE FROM dbo.PhieuMuon
     WHERE MaPhieuMuon = @MaPhieuMuon;
 END

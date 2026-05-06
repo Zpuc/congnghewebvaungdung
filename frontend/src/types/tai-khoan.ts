@@ -6,6 +6,7 @@ export type TaiKhoan = {
   matKhau?: string
   vaiTro: UserRole
   maBanDoc?: string | null
+  hinhAnh?: string | null
 }
 
 export type CreateTaiKhoanPayload = {
@@ -14,6 +15,7 @@ export type CreateTaiKhoanPayload = {
   matKhau: string
   vaiTro: UserRole
   maBanDoc?: string | null
+  hinhAnh?: string | null
 }
 
 export type UpdateTaiKhoanPayload = {
@@ -21,5 +23,6 @@ export type UpdateTaiKhoanPayload = {
   matKhau: string
   vaiTro: UserRole
   maBanDoc?: string | null
+  hinhAnh?: string | null
 }
 

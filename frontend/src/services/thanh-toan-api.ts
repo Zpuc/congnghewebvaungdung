@@ -58,3 +58,16 @@ export async function getAllThanhToan(): Promise<ThanhToan[]> {
     throw new Error(mapApiError(error, 'Không tải được danh sách thanh toán'))
   }
 }
+
+export async function thanhToanPhat(model: { maPhat: string; maThanhToan?: string; hinhThuc: string; ghiChu?: string }): Promise<{ success: boolean; message: string; maThanhToan?: string }> {
+  try {
+    const { data } = await http.post<ApiResponse<{ maThanhToan: string }>>('/api/ThanhToan/phat', model)
+    if (data?.success) {
+      return { success: true, message: data.message || 'Thanh toán thành công', maThanhToan: data.data?.maThanhToan }
+    }
+    return { success: false, message: data?.message || 'Thanh toán thất bại' }
+  } catch (error) {
+    const msg = isAxiosError(error) ? (error.response?.data as { message?: string })?.message : error instanceof Error ? error.message : 'Thanh toán thất bại'
+    return { success: false, message: msg }
+  }
+}

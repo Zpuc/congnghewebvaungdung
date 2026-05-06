@@ -17,6 +17,7 @@ export type CreateSachPayload = {
   maTheLoai?: string | null
   ngonNgu?: string | null
   tomTat?: string | null
+  anhBiaUrl?: string | null
 }
 
 export type UpdateSachPayload = {
@@ -26,5 +27,6 @@ export type UpdateSachPayload = {
   maTheLoai?: string | null
   ngonNgu?: string | null
   tomTat?: string | null
+  anhBiaUrl?: string | null
 }
 

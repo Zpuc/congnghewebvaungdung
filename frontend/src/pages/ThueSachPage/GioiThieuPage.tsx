@@ -17,7 +17,7 @@ export function GioiThieuPage() {
         </Title>
 
         {/* Giới thiệu chung */}
-        <Card type="inner" title="📖 Câu chuyện của chúng tôi" style={{ marginBottom: 24 }}>
+        <Card type="inner" title={<div style={{ textAlign: 'center' }}>📖 Câu chuyện của chúng tôi</div>} style={{ marginBottom: 24 }}>
           <Paragraph style={{ fontSize: 16, lineHeight: 1.8 }}>
             Thư viện số của chúng tôi được thành lập với sứ mệnh mang tri thức đến gần hơn với mọi
             người. Chúng tôi tin rằng việc đọc sách không chỉ là một thói quen mà còn là cách để
@@ -31,7 +31,7 @@ export function GioiThieuPage() {
         </Card>
 
         {/* Thống kê */}
-        <Card type="inner" title="📊 Con số ấn tượng" style={{ marginBottom: 24 }}>
+        <Card type="inner" title={<div style={{ textAlign: 'center' }}>📊 Con số ấn tượng</div>} style={{ marginBottom: 24 }}>
           <Row gutter={[24, 24]}>
             <Col xs={12} sm={6}>
               <Statistic
@@ -68,13 +68,13 @@ export function GioiThieuPage() {
         </Card>
 
         {/* Lịch sử phát triển */}
-        <Card type="inner" title="🕰️ Hành trình phát triển" style={{ marginBottom: 24 }}>
+        <Card type="inner" title={<div style={{ textAlign: 'center' }}>🕰️ Hành trình phát triển</div>} style={{ marginBottom: 24 }}>
           <Timeline
-            mode="left"
+            mode="start"
             items={[
               {
-                label: '2014',
-                children: (
+                title: '2014',
+                content: (
                   <>
                     <Title level={5}>Khởi đầu</Title>
                     <Paragraph>
@@ -84,8 +84,8 @@ export function GioiThieuPage() {
                 ),
               },
               {
-                label: '2016',
-                children: (
+                title: '2016',
+                content: (
                   <>
                     <Title level={5}>Mở rộng</Title>
                     <Paragraph>
@@ -95,8 +95,8 @@ export function GioiThieuPage() {
                 ),
               },
               {
-                label: '2019',
-                children: (
+                title: '2019',
+                content: (
                   <>
                     <Title level={5}>Số hóa</Title>
                     <Paragraph>
@@ -106,8 +106,8 @@ export function GioiThieuPage() {
                 ),
               },
               {
-                label: '2022',
-                children: (
+                title: '2022',
+                content: (
                   <>
                     <Title level={5}>Đổi mới</Title>
                     <Paragraph>
@@ -117,8 +117,8 @@ export function GioiThieuPage() {
                 ),
               },
               {
-                label: '2024',
-                children: (
+                title: '2024',
+                content: (
                   <>
                     <Title level={5}>Hiện tại</Title>
                     <Paragraph>
@@ -132,7 +132,7 @@ export function GioiThieuPage() {
         </Card>
 
         {/* Giá trị cốt lõi */}
-        <Card type="inner" title="💎 Giá trị cốt lõi">
+        <Card type="inner" title={<div style={{ textAlign: 'center' }}>💎 Giá trị cốt lõi</div>}>
           <Row gutter={[24, 24]}>
             <Col xs={24} md={12}>
               <Title level={4}>🎯 Sứ mệnh</Title>

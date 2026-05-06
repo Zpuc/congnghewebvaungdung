@@ -1,6 +1,6 @@
 import { Alert, Button, Checkbox, Form, Input, Typography } from 'antd'
-import { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Navigate, useNavigate, useLocation } from 'react-router-dom'
 import styles from './login.module.css'
 
 import userIconUrl from '../../assets/icons/user.svg?url'
@@ -18,9 +18,19 @@ type LoginValues = {
 export function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [form] = Form.useForm<LoginValues>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { login, isAuthenticated, user } = useAuth()
+
+  // Hiển thị message từ register
+  useEffect(() => {
+    const state = location.state as any
+    if (state?.message) {
+      setSuccessMessage(state.message)
+    }
+  }, [location.state])
 
   const onFinish = async (values: LoginValues) => {
     try {
@@ -31,7 +41,9 @@ export function LoginPage() {
         matKhau: values.matKhau,
       })
       login(result.token, result.user, Boolean(values.remember))
-      navigate(getRoleHomePath(result.user.vaiTro), { replace: true })
+      // Redirect to the page user was trying to access, or to role-based home
+      const redirectTo = (location.state as any)?.from || getRoleHomePath(result.user.vaiTro)
+      navigate(redirectTo, { replace: true })
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Không thể đăng nhập'
       setError(message)
@@ -67,9 +79,14 @@ export function LoginPage() {
             onFinish={onFinish}
             initialValues={{ remember: true }}
           >
+            {successMessage && (
+              <Form.Item>
+                <Alert type="success" message={successMessage} showIcon />
+              </Form.Item>
+            )}
             {error && (
               <Form.Item>
-                <Alert type="error" title={error} showIcon />
+                <Alert type="error" message={error} showIcon />
               </Form.Item>
             )}
 
@@ -130,7 +147,7 @@ export function LoginPage() {
           <div className={styles.footer}>
             <Typography.Text type="secondary">
               Chưa có tài khoản?{' '}
-              <a className={styles.link} href="#">
+              <a className={styles.link} href="/register">
                 Đăng ký
               </a>
             </Typography.Text>

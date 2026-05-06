@@ -22,6 +22,7 @@ CREATE TABLE Sach (
 	NamXuatBan INT,
 	NgonNgu NVARCHAR(50) NULL,
 	TomTat NVARCHAR(MAX) NULL,
+	HinhAnh NVARCHAR(500) NULL,
 	FOREIGN KEY (MaTheLoai) REFERENCES TheLoai(MaTheLoai)
 );
 
