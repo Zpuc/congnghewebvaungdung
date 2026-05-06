@@ -34,7 +34,6 @@ type FormValues = {
   maTheLoai?: string
   ngonNgu?: string
   tomTat?: string
-  anhBia?: File
 }
 
 type TheLoaiOption = {
@@ -52,6 +51,7 @@ export function BooksPage() {
   const [theLoaiOptions, setTheLoaiOptions] = useState<TheLoaiOption[]>([])
   const [form] = Form.useForm<FormValues>()
   const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const mode = editing ? 'edit' : 'create'
 
@@ -159,6 +159,7 @@ export function BooksPage() {
                   ngonNgu: record.ngonNgu ?? undefined,
                   tomTat: record.tomTat ?? undefined,
                 })
+                setSelectedFile(null)
                 setPreviewImage(
                   record.anhBiaUrl?.startsWith('http')
                     ? record.anhBiaUrl
@@ -199,6 +200,7 @@ export function BooksPage() {
   const onCreateClick = () => {
     setEditing(null)
     setPreviewImage(null)
+    setSelectedFile(null)
     form.resetFields()
     setOpen(true)
   }
@@ -209,7 +211,7 @@ export function BooksPage() {
       setPreviewImage(e.target?.result as string)
     }
     reader.readAsDataURL(file)
-    return true
+    setSelectedFile(file)
   }
 
   const onSubmit = async () => {
@@ -218,7 +220,7 @@ export function BooksPage() {
       setSaving(true)
 
       if (mode === 'create') {
-        if (values.anhBia) {
+        if (selectedFile) {
           const formData = new FormData()
           formData.append('TieuDe', values.tieuDe)
           formData.append('TacGia', values.tacGia)
@@ -226,7 +228,7 @@ export function BooksPage() {
           if (values.maTheLoai) formData.append('MaTheLoai', values.maTheLoai)
           if (values.ngonNgu) formData.append('NgonNgu', values.ngonNgu)
           if (values.tomTat) formData.append('TomTat', values.tomTat)
-          formData.append('Image', values.anhBia)
+          formData.append('Image', selectedFile)
 
           await createSachWithImage(formData)
           antMessage.success('Thêm sách thành công với ảnh bìa')
@@ -253,8 +255,8 @@ export function BooksPage() {
         }
         await updateSach(editing.maSach, payload)
 
-        if (values.anhBia) {
-          await uploadSachImage(editing.maSach, values.anhBia)
+        if (selectedFile) {
+          await uploadSachImage(editing.maSach, selectedFile)
           antMessage.success('Cập nhật sách và ảnh bìa thành công')
         } else {
           antMessage.success('Cập nhật sách thành công')
@@ -265,6 +267,7 @@ export function BooksPage() {
       form.resetFields()
       setEditing(null)
       setPreviewImage(null)
+      setSelectedFile(null)
       await fetchData()
     } catch (e) {
       if (e instanceof Error) {
@@ -358,19 +361,30 @@ export function BooksPage() {
           <Form.Item label="Tóm tắt" name="tomTat">
             <Input.TextArea rows={3} />
           </Form.Item>
-          <Form.Item label="Ảnh bìa" name="anhBia">
+          <Form.Item label="Ảnh bìa">
             <Upload
               beforeUpload={() => false}
               onChange={(info) => {
                 const file = info.file.originFileObj
                 if (file) {
-                  form.setFieldsValue({ anhBia: file })
                   handleImageChange(file)
                 }
               }}
               maxCount={1}
+              fileList={
+                selectedFile
+                  ? [
+                      {
+                        uid: '-1',
+                        name: selectedFile.name,
+                        status: 'done' as const,
+                        originFileObj: selectedFile as any,
+                      },
+                    ]
+                  : []
+              }
               onRemove={() => {
-                form.setFieldsValue({ anhBia: undefined })
+                setSelectedFile(null)
                 setPreviewImage(null)
               }}
             >
