@@ -1,4 +1,4 @@
-import { Layout, Menu, Button, Space, Typography } from 'antd'
+import { Layout, Menu, Button, Space, Typography, Dropdown, Avatar } from 'antd'
 import {
   HomeOutlined,
   InfoCircleOutlined,
@@ -6,9 +6,13 @@ import {
   ShoppingCartOutlined,
   BookOutlined,
   LoginOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  CrownOutlined,
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { useAuth } from '../auth/AuthContext'
 
 const { Header, Content, Footer } = Layout
 const { Text } = Typography
@@ -16,6 +20,7 @@ const { Text } = Typography
 export function ThueSachLayout() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { user, logout: authLogout } = useAuth()
   const [cartCount, setCartCount] = useState(0)
 
   useEffect(() => {
@@ -113,13 +118,54 @@ export function ThueSachLayout() {
           />
         </div>
         <Space>
-          <Button
-            type="primary"
-            icon={<LoginOutlined />}
-            onClick={() => navigate('/login')}
-          >
-            Đăng nhập
-          </Button>
+          {user ? (
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: 'profile',
+                    icon: <UserOutlined />,
+                    label: user.tenDangNhap || 'Người dùng',
+                  },
+                  ...(user.vaiTro === 'Quản trị'
+                    ? [
+                        {
+                          key: 'admin',
+                          icon: <CrownOutlined />,
+                          label: 'Trang quản trị',
+                          onClick: () => navigate('/admin'),
+                        },
+                      ]
+                    : []),
+                  {
+                    type: 'divider',
+                  },
+                  {
+                    key: 'logout',
+                    icon: <LogoutOutlined />,
+                    label: 'Đăng xuất',
+                    onClick: () => {
+                      authLogout()
+                      navigate('/login')
+                    },
+                  },
+                ],
+              }}
+            >
+              <Space style={{ cursor: 'pointer' }}>
+                <Avatar size="small" icon={<UserOutlined />} />
+                <Text style={{ color: 'white' }}>{user.tenDangNhap}</Text>
+              </Space>
+            </Dropdown>
+          ) : (
+            <Button
+              type="primary"
+              icon={<LoginOutlined />}
+              onClick={() => navigate('/login')}
+            >
+              Đăng nhập
+            </Button>
+          )}
         </Space>
       </Header>
 
