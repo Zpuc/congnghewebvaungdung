@@ -117,9 +117,23 @@ namespace MyWebAPI.Controllers
             if (request.Image == null || request.Image.Length == 0)
                 return BadRequest(new { message = "Vui lòng chọn ảnh bìa" });
 
-            var maSach = await _sachService.CreateAsync(request);
-            if (maSach == 0)
-                return BadRequest(new { message = "Tạo sách thất bại" });
+            var dto = new CreateSachRequest
+            {
+                TieuDe = request.TieuDe,
+                TacGia = request.TacGia,
+                NamXuatBan = request.NamXuatBan,
+                MaTheLoai = request.TheLoai,  // CreateSachWithImageRequest dùng TheLoai (string) thay vì MaTheLoai
+                NgonNgu = request.NgonNgu,
+                TomTat = request.TomTat
+            };
+
+            var result = await _sachService.CreateAsync(dto);
+            if (!result.Success || result.Data == null)
+                return BadRequest(new { message = result.Message ?? "Tạo sách thất bại" });
+
+            var maSach = result.Data.MaSach;
+            if (string.IsNullOrEmpty(maSach))
+                return BadRequest(new { message = "Không lấy được mã sách" });
 
             var fileName = $"{Guid.NewGuid():N}{Path.GetExtension(request.Image.FileName)}";
             var relativePath = Path.Combine("images", "sach", fileName).Replace('\\', '/');
@@ -136,10 +150,10 @@ namespace MyWebAPI.Controllers
         }
 
         [HttpPut("{maSach}/anhbia")]
-        public async Task<IActionResult> UpdateAnhBia(int maSach, [FromBody] UpdateAnhBiaDto dto)
+        public async Task<IActionResult> UpdateAnhBia(string maSach, [FromBody] UpdateAnhBiaDto dto)
         {
-            var ok = await _sachService.UpdateLienKetAnhAsync(maSach, dto.AnhBiaUrl);
-            return ok ? Ok() : NotFound();
+            var result = await _sachService.UpdateLienKetAnhAsync(maSach, dto.AnhBiaUrl);
+            return result.Success ? Ok() : NotFound();
         }
     }
 }
