@@ -11,10 +11,20 @@ import {
   Table,
   Tag,
   Typography,
+  Image,
+  Upload,
 } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
+import { PlusOutlined } from '@ant-design/icons'
 import type { CreateSachPayload, Sach, UpdateSachPayload } from '../../types/sach'
-import { createSach, deleteSach, getAllSach, updateSach } from '../../services/sach-api'
+import {
+  createSach,
+  createSachWithImage,
+  deleteSach,
+  getAllSach,
+  updateSach,
+  uploadSachImage,
+} from '../../services/sach-api'
 import { getAllTheLoai } from '../../services/the-loai-api'
 
 type FormValues = {
@@ -24,6 +34,7 @@ type FormValues = {
   maTheLoai?: string
   ngonNgu?: string
   tomTat?: string
+  anhBia?: File
 }
 
 type TheLoaiOption = {
@@ -32,7 +43,7 @@ type TheLoaiOption = {
 }
 
 export function BooksPage() {
-  const { message } = AntApp.useApp()
+  const { message: antMessage } = AntApp.useApp()
   const [rows, setRows] = useState<Sach[]>([])
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
@@ -40,6 +51,7 @@ export function BooksPage() {
   const [editing, setEditing] = useState<Sach | null>(null)
   const [theLoaiOptions, setTheLoaiOptions] = useState<TheLoaiOption[]>([])
   const [form] = Form.useForm<FormValues>()
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
 
   const mode = editing ? 'edit' : 'create'
 
@@ -50,7 +62,7 @@ export function BooksPage() {
       setRows(res.data ?? [])
     } catch (e) {
       const text = e instanceof Error ? e.message : 'Không tải được danh sách sách'
-      message.error(text)
+      antMessage.error(text)
     } finally {
       setLoading(false)
     }
@@ -76,6 +88,27 @@ export function BooksPage() {
         width: 70,
         align: 'center' as const,
         render: (_: unknown, __: unknown, index: number) => index + 1,
+      },
+      {
+        title: 'Ảnh bìa',
+        key: 'anhBia',
+        width: 120,
+        render: (_: unknown, record: Sach) => {
+          const imageUrl = record.anhBiaUrl
+          if (imageUrl) {
+            return (
+              <Image
+                src={imageUrl.startsWith('http') ? imageUrl : `http://localhost:5052${imageUrl}`}
+                alt={record.tieuDe}
+                width={80}
+                height={110}
+                style={{ objectFit: 'cover', background: '#f5f5f5' }}
+                fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6C3YG3R5cIjOOQmmIhkhJSUZ3VqLOtpCJ+wg7PT9J3XX6cAYHkEbXY4wuHF0QBx7TkVgC9APIFqR1nIIugbqGxYERQ1EMBEAg0xAUFkS1Cp6ZmHkzEAhjFFfLB2RZ1sH0I7jGqgR0GziTdNvod1Fg2GzBxWkF0PiJMgiiLhM3tSICn6tOLf6Vp2dNndD4G7MxdGghcRYDkGkA5XnDfRfvguyDRvLpDBKkZvg3gBqZF4nsj2G+0R4Uq7aRSjGR9zJ4F/mMc3kM8YcYwlE3K4HpGjY4VlH6a4I7z1WkZ9WkH8NkD6BRg6sD6Lq5p7HxQY7pR1l4Ea7J3xWg6aXqKxVpBVVwG8LzGj1v7G/39P/58R4GehM0GkXR8T6V0LqLcXxV2vCwAAAABJRU5ErkJggg=="
+              />
+            )
+          }
+          return <span style={{ color: '#999' }}>—</span>
+        },
       },
       {
         title: 'Mã sách',
@@ -126,6 +159,13 @@ export function BooksPage() {
                   ngonNgu: record.ngonNgu ?? undefined,
                   tomTat: record.tomTat ?? undefined,
                 })
+                setPreviewImage(
+                  record.anhBiaUrl?.startsWith('http')
+                    ? record.anhBiaUrl
+                    : record.anhBiaUrl
+                    ? `http://localhost:5052${record.anhBiaUrl}`
+                    : null
+                )
                 setOpen(true)
               }}
             >
@@ -139,11 +179,11 @@ export function BooksPage() {
               onConfirm={async () => {
                 try {
                   await deleteSach(record.maSach)
-                  message.success('Đã xóa sách')
+                  antMessage.success('Đã xóa sách')
                   await fetchData()
                 } catch (e) {
                   const text = e instanceof Error ? e.message : 'Xóa thất bại'
-                  message.error(text)
+                  antMessage.error(text)
                 }
               }}
             >
@@ -158,8 +198,18 @@ export function BooksPage() {
 
   const onCreateClick = () => {
     setEditing(null)
+    setPreviewImage(null)
     form.resetFields()
     setOpen(true)
+  }
+
+  const handleImageChange = (file: File) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      setPreviewImage(e.target?.result as string)
+    }
+    reader.readAsDataURL(file)
+    return true
   }
 
   const onSubmit = async () => {
@@ -168,16 +218,30 @@ export function BooksPage() {
       setSaving(true)
 
       if (mode === 'create') {
-        const payload: CreateSachPayload = {
-          tieuDe: values.tieuDe,
-          tacGia: values.tacGia,
-          namXuatBan: values.namXuatBan ?? null,
-          maTheLoai: values.maTheLoai?.trim() || null,
-          ngonNgu: values.ngonNgu?.trim() || null,
-          tomTat: values.tomTat?.trim() || null,
+        if (values.anhBia) {
+          const formData = new FormData()
+          formData.append('TieuDe', values.tieuDe)
+          formData.append('TacGia', values.tacGia)
+          if (values.namXuatBan) formData.append('NamXuatBan', values.namXuatBan.toString())
+          if (values.maTheLoai) formData.append('MaTheLoai', values.maTheLoai)
+          if (values.ngonNgu) formData.append('NgonNgu', values.ngonNgu)
+          if (values.tomTat) formData.append('TomTat', values.tomTat)
+          formData.append('Image', values.anhBia)
+
+          await createSachWithImage(formData)
+          antMessage.success('Thêm sách thành công với ảnh bìa')
+        } else {
+          const payload: CreateSachPayload = {
+            tieuDe: values.tieuDe,
+            tacGia: values.tacGia,
+            namXuatBan: values.namXuatBan ?? null,
+            maTheLoai: values.maTheLoai?.trim() || null,
+            ngonNgu: values.ngonNgu?.trim() || null,
+            tomTat: values.tomTat?.trim() || null,
+          }
+          await createSach(payload)
+          antMessage.success('Thêm sách thành công')
         }
-        await createSach(payload)
-        message.success('Thêm sách thành công')
       } else if (editing) {
         const payload: UpdateSachPayload = {
           tieuDe: values.tieuDe,
@@ -188,16 +252,23 @@ export function BooksPage() {
           tomTat: values.tomTat?.trim() || null,
         }
         await updateSach(editing.maSach, payload)
-        message.success('Cập nhật sách thành công')
+
+        if (values.anhBia) {
+          await uploadSachImage(editing.maSach, values.anhBia)
+          antMessage.success('Cập nhật sách và ảnh bìa thành công')
+        } else {
+          antMessage.success('Cập nhật sách thành công')
+        }
       }
 
       setOpen(false)
       form.resetFields()
       setEditing(null)
+      setPreviewImage(null)
       await fetchData()
     } catch (e) {
       if (e instanceof Error) {
-        message.error(e.message)
+        antMessage.error(e.message)
       }
     } finally {
       setSaving(false)
@@ -287,6 +358,40 @@ export function BooksPage() {
           <Form.Item label="Tóm tắt" name="tomTat">
             <Input.TextArea rows={3} />
           </Form.Item>
+          <Form.Item label="Ảnh bìa" name="anhBia">
+            <Upload
+              beforeUpload={() => false}
+              onChange={(info) => {
+                const file = info.file.originFileObj
+                if (file) {
+                  form.setFieldsValue({ anhBia: file })
+                  handleImageChange(file)
+                }
+              }}
+              maxCount={1}
+              onRemove={() => {
+                form.setFieldsValue({ anhBia: undefined })
+                setPreviewImage(null)
+              }}
+            >
+              <Button icon={<PlusOutlined />}>Chọn ảnh</Button>
+            </Upload>
+          </Form.Item>
+          {previewImage && (
+            <div style={{ marginTop: 8 }}>
+              <img
+                src={previewImage}
+                alt="Preview"
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: 200,
+                  objectFit: 'contain',
+                  border: '1px solid #d9d9d9',
+                  borderRadius: 4,
+                }}
+              />
+            </div>
+          )}
         </Form>
       </Modal>
     </Card>

@@ -74,8 +74,8 @@ export function ReaderPage() {
         listYeuCauCuaToi(),
         getAllPhieuMuon(),
       ])
-      setPhat(p.data ?? [])
-      setYeuCau(y.data ?? [])
+      setPhat(p ?? [])
+      setYeuCau(y ?? [])
       // Lọc chỉ hiển thị phiếu mượn của bạn đọc hiện tại
       if (user?.maBanDoc) {
         const allPhieuMuon = pm.data ?? []

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using MyWebAPI.BLL.Services;
 using MyWebAPI.DTO;
 using Microsoft.AspNetCore.Http;
@@ -83,91 +83,63 @@ namespace MyWebAPI.Controllers
 
             return NotFound(response);
         }
+
         // POST api/sach/upload
-        //[HttpPost("upload")]
-        //[Consumes("multipart/form-data")]
-        //public async Task<IActionResult> UploadImage([FromForm] UploadSachImageRequest request)
-        //{
-        //    if (request.File == null || request.File.Length == 0)
-        //        return BadRequest("Chưa chọn file");
+        [HttpPost("upload")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadImage([FromForm] UploadSachImageRequest request)
+        {
+            if (request.Image == null || request.Image.Length == 0)
+                return BadRequest(new { message = "Không có file ảnh" });
 
-        //    if (string.IsNullOrWhiteSpace(request.MaSach))
-        //        return BadRequest("Thiếu mã sách");
+            var sach = await _sachService.GetByIdAsync(request.MaSach);
+            if (sach == null)
+                return NotFound(new { message = "Không tìm thấy sách" });
 
-        //    var root = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-        //    var folder = Path.Combine(root, "images", "sach");
-        //    if (!Directory.Exists(folder))
-        //        Directory.CreateDirectory(folder);
+            var fileName = $"{Guid.NewGuid():N}{Path.GetExtension(request.Image.FileName)}";
+            var relativePath = Path.Combine("images", "sach", fileName).Replace('\\', '/');
+            var fullPath = Path.Combine(_env.WebRootPath, relativePath);
 
-        //    var fileName = $"{Guid.NewGuid()}_{request.File.FileName}";
-        //    var filePath = Path.Combine(folder, fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+            using var stream = new FileStream(fullPath, FileMode.Create);
+            await request.Image.CopyToAsync(stream);
 
-        //    using (var stream = new FileStream(filePath, FileMode.Create))
-        //    {
-        //        await request.File.CopyToAsync(stream);
-        //    }
+            var imageUrl = $"/{relativePath.Replace('\\', '/')}";
+            await _sachService.UpdateLienKetAnhAsync(request.MaSach, imageUrl);
 
-        //    var fileUrl = $"/images/sach/{fileName}";
+            return Ok(new { imageUrl });
+        }
 
-        //    var result = await _sachService.UpdateLienKetAnhAsync(request.MaSach, fileUrl);
-        //    if (result == null || !result.Success)
-        //    {
-        //        return StatusCode(500, result ?? new ResponseDTO<bool>
-        //        {
-        //            Success = false,
-        //            Message = "Cập nhật DB thất bại",
-        //            Data = false
-        //        });
-        //    }
+        [HttpPost("create-with-image")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreateWithImage([FromForm] CreateSachWithImageRequest request)
+        {
+            if (request.Image == null || request.Image.Length == 0)
+                return BadRequest(new { message = "Vui lòng chọn ảnh bìa" });
 
-        //    return Ok(new
-        //    {
-        //        success = true,
-        //        url = fileUrl
-        //    });
-        //}
-        //[HttpPost("create-with-image")]
-        //[Consumes("multipart/form-data")]
-        //public async Task<IActionResult> CreateWithImage([FromForm] CreateSachWithImageRequest request)
-        //{
-        //    string? fileUrl = null;
+            var maSach = await _sachService.CreateAsync(request);
+            if (maSach == 0)
+                return BadRequest(new { message = "Tạo sách thất bại" });
 
-        //    if (request.File != null && request.File.Length > 0)
-        //    {
-        //        var root = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-        //        var folder = Path.Combine(root, "images", "sach");
+            var fileName = $"{Guid.NewGuid():N}{Path.GetExtension(request.Image.FileName)}";
+            var relativePath = Path.Combine("images", "sach", fileName).Replace('\\', '/');
+            var fullPath = Path.Combine(_env.WebRootPath, relativePath);
 
-        //        if (!Directory.Exists(folder))
-        //            Directory.CreateDirectory(folder);
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+            using var stream = new FileStream(fullPath, FileMode.Create);
+            await request.Image.CopyToAsync(stream);
 
-        //        var fileName = $"{Guid.NewGuid()}_{request.File.FileName}";
-        //        var filePath = Path.Combine(folder, fileName);
+            var imageUrl = $"/{relativePath.Replace('\\', '/')}";
+            await _sachService.UpdateLienKetAnhAsync(maSach, imageUrl);
 
-        //        using (var stream = new FileStream(filePath, FileMode.Create))
-        //        {
-        //            await request.File.CopyToAsync(stream);
-        //        }
+            return Ok(new { maSach, imageUrl });
+        }
 
-        //        fileUrl = $"/images/sach/{fileName}";
-        //    }
-
-        //    var dto = new CreateSachRequest
-        //    {
-        //        TieuDe = request.TieuDe,
-        //        TacGia = request.TacGia,
-        //        NamXuatBan = request.NamXuatBan,
-        //        MaTheLoai = request.MaTheLoai,  // ← QUAN TRỌNG
-        //        NgonNgu = request.NgonNgu,
-        //        TomTat = request.TomTat,
-        //        LienKetAnh = fileUrl  // ← Đường dẫn ảnh
-        //    };
-
-        //    var result = await _sachService.CreateAsync(dto);
-
-        //    if (!result.Success)
-        //        return BadRequest(result);
-
-        //    return Ok(result);
-        //}
+        [HttpPut("{maSach}/anhbia")]
+        public async Task<IActionResult> UpdateAnhBia(int maSach, [FromBody] UpdateAnhBiaDto dto)
+        {
+            var ok = await _sachService.UpdateLienKetAnhAsync(maSach, dto.AnhBiaUrl);
+            return ok ? Ok() : NotFound();
+        }
     }
 }
