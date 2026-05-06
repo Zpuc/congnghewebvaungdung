@@ -98,7 +98,7 @@ export function BooksPage() {
           if (imageUrl) {
             return (
               <Image
-                src={imageUrl.startsWith('http') ? imageUrl : `http://localhost:5052${imageUrl}`}
+                src={imageUrl.startsWith('http') ? imageUrl : `http://localhost:5001${imageUrl}`}
                 alt={record.tieuDe}
                 width={80}
                 height={110}
@@ -164,7 +164,7 @@ export function BooksPage() {
                   record.anhBiaUrl?.startsWith('http')
                     ? record.anhBiaUrl
                     : record.anhBiaUrl
-                    ? `http://localhost:5052${record.anhBiaUrl}`
+                    ? `http://localhost:5001${record.anhBiaUrl}`
                     : null
                 )
                 setOpen(true)
